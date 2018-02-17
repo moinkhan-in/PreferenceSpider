@@ -1,0 +1,1 @@
+include ':app', ':preferencespider-annotations', ':preferencespider-compiler', ':preferencespider'
