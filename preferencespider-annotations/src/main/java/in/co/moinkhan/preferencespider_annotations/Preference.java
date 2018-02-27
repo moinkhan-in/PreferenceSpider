@@ -10,5 +10,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 public @interface Preference {
     String key();
-    String defaultValue();
+    String defaultValue() default "";
+    String format() default "";
 }

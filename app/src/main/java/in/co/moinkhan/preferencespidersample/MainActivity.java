@@ -5,28 +5,36 @@ import android.os.Bundle;
 import android.util.Log;
 
 import in.co.moinkhan.preferencespider.PreferenceSpider;
-import in.co.moinkhan.preferencespider.PreferenceUtils;
 import in.co.moinkhan.preferencespider_annotations.Preference;
 
 public class MainActivity extends AppCompatActivity {
 
-    @Preference(key = "sp_username", defaultValue = "userDefault")
-    String userName;
+    @Preference(key = "sp_string", defaultValue = "userDefault")
+    String spString;
 
-    @Preference(key = "sp_password", defaultValue = "passDefault")
-    String password;
+    @Preference(key = "sp_int", defaultValue = "123")
+    int spInt;
+
+    @Preference(key = "sp_boolean", defaultValue = "true")
+    boolean spBoolean;
+
+    @Preference(key = "sp_float", defaultValue = "12.15f")
+    float spFloat;
+
+    @Preference(key = "sp_long", defaultValue = "1215")
+    long spLong;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        PreferenceSpider.readValues(this);
-        Log.d("Brfore Updation: ", userName + " " + password);
+        PreferenceSpider.read(this);
+        Log.d("Brfore Updation: ", spString + " " + spInt);
 
-        userName = "Moinkhan";
-        password = "Moinkhan Pathan";
+        spString = "Moinkhan";
+        spInt = 789;
 
-        PreferenceSpider.writeValues(this);
+        PreferenceSpider.write(this);
     }
 }

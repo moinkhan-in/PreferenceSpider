@@ -1,13 +1,11 @@
 package in.co.moinkhan.preferencespider_compiler;
 
-import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.JavaFile;
-import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -21,6 +19,8 @@ import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.TypeKind;
+import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
@@ -37,7 +37,6 @@ public class PreferenceSpiderCompiler extends AbstractProcessor {
     private Filer filer;
     private Elements elementUtils;
     private Types typeUtils;
-    private ClassName PREFERENCE_HELPER = ClassName.get("in.co.moinkhan.preferencespider", "PreferenceUtils");
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnvironment) {
@@ -81,48 +80,29 @@ public class PreferenceSpiderCompiler extends AbstractProcessor {
             TypeElement classElement = entry.getKey();
             final String className = classElement.getSimpleName().toString();
 
-            MethodSpec.Builder readPreferenceValues = MethodSpec.methodBuilder("bindPreferenceValue");
-            MethodSpec.Builder commitPreferenceValues = MethodSpec.methodBuilder("commitPreferenceValues");
+            BindingClass bindingClass = new BindingClass();
+            bindingClass.setTargetName(className);
+
+            Set<BindingField> models = new HashSet<>();
+            bindingClass.setVarList(models);
 
             for (Element prefElement : entry.getValue()) {
                 Preference prefAnnotation = prefElement.getAnnotation(Preference.class);
 
-                CodeBlock readBlock = CodeBlock.of("$L.$L = $T.readPreferenceValue($L, $S, $S);\n",
+
+                models.add(new BindingField(
                         className.toLowerCase(),
                         prefElement.getSimpleName().toString(),
-                        PREFERENCE_HELPER,
-                        className.toLowerCase(),
                         prefAnnotation.key(),
+                        prefAnnotation.format(),
+                        prefElement.asType(),
                         prefAnnotation.defaultValue()
-                );
-                readPreferenceValues.addCode(readBlock);
-
-                CodeBlock commitBlock = CodeBlock.of("$T.writePreferenceValue($L, $S, $L.$L);\n",
-                        PREFERENCE_HELPER,
-                        className.toLowerCase(),
-                        prefAnnotation.key(),
-                        className.toLowerCase(),
-                        prefElement.getSimpleName().toString()
-                );
-                commitPreferenceValues.addCode(commitBlock);
+                ));
             }
 
-            readPreferenceValues.addParameter(ClassName.get(classElement), className.toLowerCase())
-                    .addModifiers(Modifier.PUBLIC, STATIC)
+            TypeSpec typeSpec = bindingClass.getClassCode(classElement);
+            JavaFile file = JavaFile.builder(elementUtils.getPackageOf(classElement).toString(), typeSpec)
                     .build();
-
-            commitPreferenceValues.addParameter(ClassName.get(classElement), className.toLowerCase())
-                    .addModifiers(Modifier.PUBLIC, STATIC)
-                    .build();
-
-            TypeSpec injectClass = TypeSpec.classBuilder(className + "_PreferenceSpider")
-                    .addMethod(readPreferenceValues.build())
-                    .addMethod(commitPreferenceValues.build())
-                    .build();
-
-            JavaFile file = JavaFile.builder(elementUtils.getPackageOf(classElement).toString(), injectClass)
-                    .build();
-
             try {
                 file.writeTo(filer);
             } catch (IOException e) {
@@ -166,11 +146,79 @@ public class PreferenceSpiderCompiler extends AbstractProcessor {
             hasError = true;
         }
 
+        // verify default value
+        Preference preference = (Preference) element.getAnnotation(annotationClass);
+        String defaultValue = preference.defaultValue();
+        TypeMirror dataType = element.asType();
+
+        showMessage(dataType.getKind().toString() + "-> " +  Boolean.class.getPackage());
+        if (dataType.getKind() == TypeKind.BOOLEAN ) {
+            boolean isValid = isValidBoolean(defaultValue);
+            if (!isValid) {
+                error(enclosingElement, "Default value of %s %s is not valid boolean. (%s.%s)" , annotationClass.getSimpleName(), targetThing, enclosingElement.getQualifiedName(), element.getSimpleName());
+                hasError = true;
+            }
+        } else if (dataType.getKind() == TypeKind.INT) {
+            boolean isValid = isValidInt(defaultValue);
+            if (!isValid) {
+                error(enclosingElement, "Default value of %s %s is not valid integer. (%s.%s)" , annotationClass.getSimpleName(), targetThing, enclosingElement.getQualifiedName(), element.getSimpleName());
+                hasError = true;
+            }
+        } else if (dataType.getKind() == TypeKind.LONG) {
+            boolean isValid = isValidLong(defaultValue);
+            if (!isValid) {
+                error(enclosingElement, "Default value of %s %s is not valid long. (%s.%s)" , annotationClass.getSimpleName(), targetThing, enclosingElement.getQualifiedName(), element.getSimpleName());
+                hasError = true;
+            }
+        } else if (dataType.getKind() == TypeKind.FLOAT) {
+            boolean isValid = isValidFloat(defaultValue);
+            if (!isValid) {
+                error(enclosingElement, "Default value of %s %s is not valid float. (%s.%s)" , annotationClass.getSimpleName(), targetThing, enclosingElement.getQualifiedName(), element.getSimpleName());
+                hasError = true;
+            }
+        }
+
+
         return hasError;
+    }
+
+    private boolean isValidFloat(String defaultValue) {
+        try {
+            Float.parseFloat(defaultValue);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    private boolean isValidLong(String defaultValue) {
+        try {
+            Long.parseLong(defaultValue);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    private boolean isValidInt(String defaultValue) {
+        try {
+            Integer.parseInt(defaultValue);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    private boolean isValidBoolean(String defaultValue) {
+        return "true".equalsIgnoreCase(defaultValue) || "false".equalsIgnoreCase(defaultValue);
     }
 
     private void error(Element element, String message, Object... args) {
         printMessage(element, message, args);
+    }
+
+    private void showMessage(String message) {
+        processingEnv.getMessager().printMessage(Diagnostic.Kind.WARNING, message);
     }
 
     private void printMessage(Element element, String message, Object[] args) {

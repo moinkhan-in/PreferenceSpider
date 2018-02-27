@@ -13,11 +13,11 @@ import java.lang.reflect.Method;
 
 public class PreferenceSpider {
 
-    public static void readValues(Activity activity) {
+    public static void read(Activity activity) {
         createPreferenceBinding(activity);
     }
 
-    public static void readValues(Fragment fragment) {
+    public static void read(Fragment fragment) {
         createPreferenceBinding(fragment);
     }
 
@@ -39,7 +39,7 @@ public class PreferenceSpider {
         }
     }
 
-    public static void writeValues(Activity activity) {
+    public static void write(Activity activity) {
         initiateWriteOperation(activity);
     }
 

@@ -7,7 +7,7 @@ import in.co.moinkhan.preferencespider_annotations.Preference;
 
 public class PreferenceActivity extends AppCompatActivity {
 
-    @Preference(key = "increment", defaultValue = "as")
+    @Preference(key = "increment", defaultValue = "as", format = "asd")
     String increment;
 
     @Override
