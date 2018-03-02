@@ -1,4 +1,31 @@
 apply plugin: 'java-library'
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'com.github.dcendents.android-maven'
+
+
+ext {
+    bintrayRepo = 'PreferenceSpider'
+    bintrayName = 'PreferenceSpider-Compiler'
+
+    publishedGroupId = 'in.moinkhan'
+    libraryName = 'PreferenceSpider'
+    artifact = 'preference-spider-compiler'
+
+    libraryDescription = 'A compiler will generate the code for preference annotation.'
+
+    siteUrl = 'https://github.com/msquare097'
+    gitUrl = 'https://m_pathan@bitbucket.org/m_pathan/preferencespider.git'
+
+    libraryVersion = 'alpha-1.1'
+
+    developerId = 'msquare'
+    developerName = 'Moinkhan Pathan'
+    developerEmail = 'pathan.moin015@gmail.com'
+
+    licenseName = 'The Apache Software License, Version 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    allLicenses = ["Apache-2.0"]
+}
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
@@ -8,3 +35,6 @@ dependencies {
 
 sourceCompatibility = "1.7"
 targetCompatibility = "1.7"
+
+apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
+apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/bintrayv1.gradle'
