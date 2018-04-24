@@ -152,25 +152,50 @@ public class PreferenceSpiderCompiler extends AbstractProcessor {
         TypeMirror dataType = element.asType();
 
         showMessage(dataType.getKind().toString() + "-> " +  Boolean.class.getPackage());
+        String format = preference.format();
         if (dataType.getKind() == TypeKind.BOOLEAN ) {
+            boolean isFormatApplicable = isFormatApplicable(format);
+            if (isFormatApplicable) {
+                error(enclosingElement, "Format is only applicable in string preference. (%s.%s)", enclosingElement.getQualifiedName(), element.getSimpleName());
+                hasError = true;
+            }
+
             boolean isValid = isValidBoolean(defaultValue);
             if (!isValid) {
                 error(enclosingElement, "Default value of %s %s is not valid boolean. (%s.%s)" , annotationClass.getSimpleName(), targetThing, enclosingElement.getQualifiedName(), element.getSimpleName());
                 hasError = true;
             }
         } else if (dataType.getKind() == TypeKind.INT) {
+            boolean isFormatApplicable = isFormatApplicable(format);
+            if (isFormatApplicable) {
+                error(enclosingElement, "Format is only applicable in string preference. (%s.%s)", enclosingElement.getQualifiedName(), element.getSimpleName());
+                hasError = true;
+            }
+
             boolean isValid = isValidInt(defaultValue);
             if (!isValid) {
                 error(enclosingElement, "Default value of %s %s is not valid integer. (%s.%s)" , annotationClass.getSimpleName(), targetThing, enclosingElement.getQualifiedName(), element.getSimpleName());
                 hasError = true;
             }
         } else if (dataType.getKind() == TypeKind.LONG) {
+            boolean isFormatApplicable = isFormatApplicable(format);
+            if (isFormatApplicable) {
+                error(enclosingElement, "Format is only applicable in string preference. (%s.%s)", enclosingElement.getQualifiedName(), element.getSimpleName());
+                hasError = true;
+            }
+
             boolean isValid = isValidLong(defaultValue);
             if (!isValid) {
                 error(enclosingElement, "Default value of %s %s is not valid long. (%s.%s)" , annotationClass.getSimpleName(), targetThing, enclosingElement.getQualifiedName(), element.getSimpleName());
                 hasError = true;
             }
         } else if (dataType.getKind() == TypeKind.FLOAT) {
+            boolean isFormatApplicable = isFormatApplicable(format);
+            if (isFormatApplicable) {
+                error(enclosingElement, "Format is only applicable in string preference. (%s.%s)", enclosingElement.getQualifiedName(), element.getSimpleName());
+                hasError = true;
+            }
+
             boolean isValid = isValidFloat(defaultValue);
             if (!isValid) {
                 error(enclosingElement, "Default value of %s %s is not valid float. (%s.%s)" , annotationClass.getSimpleName(), targetThing, enclosingElement.getQualifiedName(), element.getSimpleName());
@@ -180,6 +205,10 @@ public class PreferenceSpiderCompiler extends AbstractProcessor {
 
 
         return hasError;
+    }
+
+    private boolean isFormatApplicable(String format) {
+        return format != null && format.trim().length() > 0;
     }
 
     private boolean isValidFloat(String defaultValue) {

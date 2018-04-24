@@ -17,6 +17,7 @@ public class BindingField {
     private String format;
     private TypeMirror elementKind;
     private String defaultVal;
+    private boolean readOnly = false;
 
     public BindingField(String targetParam, String varName, String prefKey, String format, TypeMirror elementKind, String defaultVal) {
         this.targetParam = targetParam;
@@ -25,11 +26,21 @@ public class BindingField {
         this.format = format;
         this.elementKind = elementKind;
         this.defaultVal = defaultVal;
+        this.readOnly = isStringFormatApplicable();
     }
 
     public CodeBlock readBlock() {
         String argument = "java.lang.String".equals(elementKind.toString()) ? "$S" : "$L";
-        return CodeBlock.of("$L.$L = $T.readPreferenceValue($L, $S, " + argument + ");\n",
+        String variable = "$L.$L";
+        String assignmentOperator = " = ";
+        String expression = "$T.readPreferenceValue($L, $S, " + argument + ")";
+        String formatWrapper = "String.format(\"" + format + "\", " + expression + ")";
+
+        if (isStringFormatApplicable()) {
+            expression = formatWrapper;
+        }
+
+        return CodeBlock.of(variable + assignmentOperator + expression + ";\n",
                 targetParam,
                 varName,
                 PREFERENCE_HELPER,
@@ -40,6 +51,11 @@ public class BindingField {
     }
 
     public CodeBlock writeBlock() {
+
+        if (readOnly) {
+            return CodeBlock.of("", "");
+        }
+
         return CodeBlock.of("$T.writePreferenceValue($L, $S, $L.$L);\n",
                 PREFERENCE_HELPER,
                 targetParam,
@@ -47,5 +63,9 @@ public class BindingField {
                 targetParam,
                 varName
         );
+    }
+
+    private boolean isStringFormatApplicable() {
+        return format != null && format.length() > 0;
     }
 }

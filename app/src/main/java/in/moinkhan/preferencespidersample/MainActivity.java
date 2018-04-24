@@ -12,8 +12,8 @@ public class MainActivity extends AppCompatActivity {
     @Preference(key = "sp_string", defaultValue = "userDefault")
     String spString;
 
-    @Preference(key = "sp_int", defaultValue = "123")
-    int spInt;
+    @Preference(key = "sp_int", defaultValue = "3")
+    String spInt;
 
     @Preference(key = "sp_boolean", defaultValue = "true")
     boolean spBoolean;
@@ -30,10 +30,10 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         PreferenceSpider.read(this);
-        Log.d("Brfore Updation: ", spString + " " + spInt);
+        Log.d("Brfore Updation: ", spString + " ----> " + spInt);
 
         spString = "Moinkhan";
-        spInt = 789;
+//        spInt = 789;
 
         PreferenceSpider.write(this);
     }

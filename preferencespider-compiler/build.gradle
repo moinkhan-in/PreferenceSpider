@@ -9,14 +9,14 @@ ext {
 
     publishedGroupId = 'in.moinkhan'
     libraryName = 'PreferenceSpider'
-    artifact = 'preference-spider-compiler'
+    artifact = 'preferencespider-compiler'
 
     libraryDescription = 'A compiler will generate the code for preference annotation.'
 
     siteUrl = 'https://github.com/msquare097'
     gitUrl = 'https://m_pathan@bitbucket.org/m_pathan/preferencespider.git'
 
-    libraryVersion = 'alpha-1.1'
+    libraryVersion = 'alpha-1.2'
 
     developerId = 'msquare'
     developerName = 'Moinkhan Pathan'

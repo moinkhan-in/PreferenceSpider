@@ -8,14 +8,14 @@ ext {
 
     publishedGroupId = 'in.moinkhan'
     libraryName = 'PreferenceSpider'
-    artifact = 'preference-spider'
+    artifact = 'preferencespider'
 
     libraryDescription = 'A library to handle the Preferences without boilerplate code using annotations.'
 
     siteUrl = 'https://github.com/msquare097'
     gitUrl = 'https://m_pathan@bitbucket.org/m_pathan/preferencespider.git'
 
-    libraryVersion = 'alpha-1.1'
+    libraryVersion = 'alpha-1.2'
 
     developerId = 'msquare'
     developerName = 'Moinkhan Pathan'
