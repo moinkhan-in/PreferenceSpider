@@ -1,6 +1,8 @@
 package in.moinkhan.preferencespider_compiler;
 
 import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.CodeBlock;
+import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
 
@@ -38,15 +40,25 @@ public class BindingClass {
             commitPreferenceValues.addCode(bindingField.writeBlock());
         }
 
-        readPreferenceValues.addParameter(ClassName.get(typeElement), targetName.toLowerCase())
-                .addModifiers(Modifier.PUBLIC, STATIC)
+        readPreferenceValues
+                .addAnnotation(Override.class)
+                .addModifiers(Modifier.PUBLIC)
                 .build();
 
-        commitPreferenceValues.addParameter(ClassName.get(typeElement), targetName.toLowerCase())
-                .addModifiers(Modifier.PUBLIC, STATIC)
+        commitPreferenceValues
+                .addAnnotation(Override.class)
+                .addModifiers(Modifier.PUBLIC)
                 .build();
+
+        MethodSpec.Builder constructor = MethodSpec.constructorBuilder()
+                .addModifiers(Modifier.PUBLIC)
+                .addParameter(ClassName.get(typeElement), targetName.toLowerCase())
+                .addCode(CodeBlock.of("this.$L = $L;\n", targetName.toLowerCase(), targetName.toLowerCase()));
 
         return TypeSpec.classBuilder(targetName + "_PreferenceSpider")
+                .addSuperinterface(Imports.PREFERENCE_BINDER)
+                .addField(FieldSpec.builder(ClassName.get(typeElement), targetName.toLowerCase(), Modifier.PRIVATE).build())
+                .addMethod(constructor.build())
                 .addMethod(readPreferenceValues.build())
                 .addMethod(commitPreferenceValues.build())
                 .build();

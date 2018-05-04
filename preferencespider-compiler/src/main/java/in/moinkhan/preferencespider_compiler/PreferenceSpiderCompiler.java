@@ -151,9 +151,9 @@ public class PreferenceSpiderCompiler extends AbstractProcessor {
         String defaultValue = preference.defaultValue();
         TypeMirror dataType = element.asType();
 
-        showMessage(dataType.getKind().toString() + "-> " +  Boolean.class.getPackage());
+        showMessage(dataType.getKind().toString() + "-> " + Boolean.class.getPackage());
         String format = preference.format();
-        if (dataType.getKind() == TypeKind.BOOLEAN ) {
+        if (dataType.getKind() == TypeKind.BOOLEAN) {
             boolean isFormatApplicable = isFormatApplicable(format);
             if (isFormatApplicable) {
                 error(enclosingElement, "Format is only applicable in string preference. (%s.%s)", enclosingElement.getQualifiedName(), element.getSimpleName());
@@ -162,7 +162,7 @@ public class PreferenceSpiderCompiler extends AbstractProcessor {
 
             boolean isValid = isValidBoolean(defaultValue);
             if (!isValid) {
-                error(enclosingElement, "Default value of %s %s is not valid boolean. (%s.%s)" , annotationClass.getSimpleName(), targetThing, enclosingElement.getQualifiedName(), element.getSimpleName());
+                error(enclosingElement, "Default value of %s %s is not valid boolean. (%s.%s)", annotationClass.getSimpleName(), targetThing, enclosingElement.getQualifiedName(), element.getSimpleName());
                 hasError = true;
             }
         } else if (dataType.getKind() == TypeKind.INT) {
@@ -174,7 +174,7 @@ public class PreferenceSpiderCompiler extends AbstractProcessor {
 
             boolean isValid = isValidInt(defaultValue);
             if (!isValid) {
-                error(enclosingElement, "Default value of %s %s is not valid integer. (%s.%s)" , annotationClass.getSimpleName(), targetThing, enclosingElement.getQualifiedName(), element.getSimpleName());
+                error(enclosingElement, "Default value of %s %s is not valid integer. (%s.%s)", annotationClass.getSimpleName(), targetThing, enclosingElement.getQualifiedName(), element.getSimpleName());
                 hasError = true;
             }
         } else if (dataType.getKind() == TypeKind.LONG) {
@@ -186,7 +186,7 @@ public class PreferenceSpiderCompiler extends AbstractProcessor {
 
             boolean isValid = isValidLong(defaultValue);
             if (!isValid) {
-                error(enclosingElement, "Default value of %s %s is not valid long. (%s.%s)" , annotationClass.getSimpleName(), targetThing, enclosingElement.getQualifiedName(), element.getSimpleName());
+                error(enclosingElement, "Default value of %s %s is not valid long. (%s.%s)", annotationClass.getSimpleName(), targetThing, enclosingElement.getQualifiedName(), element.getSimpleName());
                 hasError = true;
             }
         } else if (dataType.getKind() == TypeKind.FLOAT) {
@@ -198,7 +198,7 @@ public class PreferenceSpiderCompiler extends AbstractProcessor {
 
             boolean isValid = isValidFloat(defaultValue);
             if (!isValid) {
-                error(enclosingElement, "Default value of %s %s is not valid float. (%s.%s)" , annotationClass.getSimpleName(), targetThing, enclosingElement.getQualifiedName(), element.getSimpleName());
+                error(enclosingElement, "Default value of %s %s is not valid float. (%s.%s)", annotationClass.getSimpleName(), targetThing, enclosingElement.getQualifiedName(), element.getSimpleName());
                 hasError = true;
             }
         }
@@ -221,6 +221,13 @@ public class PreferenceSpiderCompiler extends AbstractProcessor {
     }
 
     private boolean isValidLong(String defaultValue) {
+
+        if (defaultValue != null && defaultValue.trim().length() > 0) {
+            if (defaultValue.charAt(defaultValue.length() - 1) == 'L') {
+                defaultValue = defaultValue.substring(0, defaultValue.length() - 1);
+            }
+        }
+
         try {
             Long.parseLong(defaultValue);
             return true;

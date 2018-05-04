@@ -12,16 +12,13 @@ public class MainActivity extends AppCompatActivity {
     @Preference(key = "sp_string", defaultValue = "userDefault")
     String spString;
 
-    @Preference(key = "sp_int", defaultValue = "3")
-    String spInt;
-
     @Preference(key = "sp_boolean", defaultValue = "true")
     boolean spBoolean;
 
     @Preference(key = "sp_float", defaultValue = "12.15f")
     float spFloat;
 
-    @Preference(key = "sp_long", defaultValue = "1215")
+    @Preference(key = "sp_long", defaultValue = "1215L")
     long spLong;
 
     @Override
@@ -30,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         PreferenceSpider.read(this);
-        Log.d("Brfore Updation: ", spString + " ----> " + spInt);
+        Log.d("Brfore Updation: ", spString);
 
         spString = "Moinkhan";
 //        spInt = 789;
