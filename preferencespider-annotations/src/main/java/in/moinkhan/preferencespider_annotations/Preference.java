@@ -10,6 +10,12 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 public @interface Preference {
     String key();
+
     String defaultValue() default "";
+
     String format() default "";
+
+    String name() default "";
+
+    boolean readOnly() default false;
 }

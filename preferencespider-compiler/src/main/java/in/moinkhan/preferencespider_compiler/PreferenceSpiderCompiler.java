@@ -89,14 +89,15 @@ public class PreferenceSpiderCompiler extends AbstractProcessor {
             for (Element prefElement : entry.getValue()) {
                 Preference prefAnnotation = prefElement.getAnnotation(Preference.class);
 
-
                 models.add(new BindingField(
                         className.toLowerCase(),
                         prefElement.getSimpleName().toString(),
                         prefAnnotation.key(),
                         prefAnnotation.format(),
                         prefElement.asType(),
-                        prefAnnotation.defaultValue()
+                        prefAnnotation.defaultValue(),
+                        prefAnnotation.name(),
+                        prefAnnotation.readOnly()
                 ));
             }
 

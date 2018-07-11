@@ -27,6 +27,7 @@ dependencies {
     implementation project(':preferencespider-annotations')
     implementation project(':preferencespider')
     annotationProcessor project(":preferencespider-compiler")
+
     implementation 'com.android.support:appcompat-v7:26.1.0'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     testImplementation 'junit:junit:4.12'

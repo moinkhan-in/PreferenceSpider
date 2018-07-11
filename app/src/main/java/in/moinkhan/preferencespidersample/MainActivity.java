@@ -9,13 +9,13 @@ import in.moinkhan.preferencespider_annotations.Preference;
 
 public class MainActivity extends AppCompatActivity {
 
-    @Preference(key = "sp_string", defaultValue = "userDefault")
+    @Preference(key = "sp_string", defaultValue = "userDefault", format = "This is men.")
     String spString;
 
-    @Preference(key = "sp_boolean", defaultValue = "true")
+    @Preference(name = "myfile", key = "sp_boolean", defaultValue = "true")
     boolean spBoolean;
 
-    @Preference(key = "sp_float", defaultValue = "12.15f")
+    @Preference(key = "sp_float", defaultValue = "12.15f", readOnly = true)
     float spFloat;
 
     @Preference(key = "sp_long", defaultValue = "1215L")
@@ -27,11 +27,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         PreferenceSpider.read(this);
-        Log.d("Brfore Updation: ", spString);
-
         spString = "Moinkhan";
-//        spInt = 789;
-
         PreferenceSpider.write(this);
     }
 }
