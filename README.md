@@ -69,8 +69,8 @@ You can also use the format attribute to make string.
     @Preference(key = "sp_username", defaultValue = "Guest", format = "Welcome: %s")
     String spString;
 ```
-  - Currently format attribute is applicable on string preference.
-  - You can give only 1 format specifier, otherwise it crash as it intend too.
+  - Currently format attribute is only applicable on string preference.
+  - You can give only 1 format specifier, otherwise it throws `MissingArgumentException` as preference contain single value.
   - Once you apply the format that field will become default readOnly. Because your preferece should not be overwrite with formatted string.
 
 
