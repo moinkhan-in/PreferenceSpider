@@ -76,7 +76,7 @@ To make field read only use `readOnly` attribute. (Applying `write` will not upd
   boolean spBoolean;
 ```
 
-You can also use the `format` attribute to make formatted string. e.g Welcome: <Preferece Value>
+You can also use the `format` attribute to make formatted string. e.g Welcome: [Preferece Value]
 ```java
     @Preference(key = "sp_username", defaultValue = "Guest", format = "Welcome: %s")
     String spString;
