@@ -43,11 +43,11 @@ Configure preference file name at application level, So that you don't have to p
 
     @Override
     public void onCreate() {
-        super.onCreate();
-        new PreferenceSpider.Builder(getApplicationContext())
-                .preferenceName("my_file")
-                .allowLog(true)
-                .build();
+      super.onCreate();
+      new PreferenceSpider.Builder(getApplicationContext())
+        .preferenceName("my_file")
+        .allowLog(true)
+        .build();
     }
   }
 ```
