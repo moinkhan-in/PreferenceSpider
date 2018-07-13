@@ -2,13 +2,13 @@
 Bind android shared preference values to field.
 Read/Write operations of sharedpreferences are done using the only annotation.
 
-__Remember: The PreferenceSpider is like ButterKnife, But this library bind sharedpreferences.
+__Remember: The PreferenceSpider is like ButterKnife, But this library bind sharedpreferences.__
 
 Field binding with shared preferences of Android which uses annotation processing to generate boilerplate
 code for you.
 
  * Eliminate creating of preference class by using `@Preference` on fields.
- * It use code generation instead of reflection to make it fater.
+ * It use code generation instead of reflection to make it faster.
  * Eliminate boilerplate code to read/write the preference code.
  * Apply formating directly on preference.
 
@@ -27,6 +27,12 @@ class ExampleActivity extends Activity {
     
     PreferenceSpider.read(this);
     // TODO Use fields...
+  }
+  
+  // some event on which you want to save shared preference.
+  @OnClick(R.id.btnSave)
+  void onSaveClicked() {
+    PreferenceSpider.write(this);
   }
 }
 ```
