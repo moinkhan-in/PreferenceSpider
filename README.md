@@ -2,10 +2,13 @@
 Bind android shared preference values to field.
 Read/Write operations of sharedpreferences are done using the only annotation.
 
+__Remember: The PreferenceSpider is like ButterKnife, But this library bind sharedpreferences.
+
 Field binding with shared preferences of Android which uses annotation processing to generate boilerplate
 code for you.
 
  * Eliminate creating of preference class by using `@Preference` on fields.
+ * It use code generation instead of reflection to make it fater.
  * Eliminate boilerplate code to read/write the preference code.
  * Apply formating directly on preference.
 
@@ -28,9 +31,7 @@ class ExampleActivity extends Activity {
 }
 ```
 
-__Remember: A preferenceSpider is like ButterKnife only infinitely less sharp.__
-
-__Note: Above example will use the default shared preferences, if you want to user your own preference file name then,__
+__Note: Above example will use the default shared preferences, if you want to user your preference file name then,__
 
 ```java
   @Preference(name = "my_file", key = "sp_string", defaultValue = "userDefault")
@@ -58,13 +59,13 @@ Update all fields into shared preferences.
   PreferenceSpider.write(this);
 ```
 
-To make field read only. (Applying `write` will not update that field into preference.)
+To make field read only use `readOnly` attribute. (Applying `write` will not update that field into preference)
 ```java
   @Preference(key = "sp_boolean", defaultValue = "true", readOnly = true)
   boolean spBoolean;
 ```
 
-You can also use the format attribute to make string.
+You can also use the `format` attribute to make formatted string.
 ```java
     @Preference(key = "sp_username", defaultValue = "Guest", format = "Welcome: %s")
     String spString;
