@@ -37,7 +37,7 @@ class ExampleActivity extends Activity {
 }
 ```
 
-__Note: Above example will use the default shared preferences, if you want to user your preference file name then,__
+__Note: Above example will use the default shared preferences, If you want to use your preference file name then,__
 
 ```java
   @Preference(name = "my_file", key = "sp_string", defaultValue = "userDefault")
@@ -71,7 +71,7 @@ To make field read only use `readOnly` attribute. (Applying `write` will not upd
   boolean spBoolean;
 ```
 
-You can also use the `format` attribute to make formatted string.
+You can also use the `format` attribute to make formatted string. e.g Welcome: <Preferece Value>
 ```java
     @Preference(key = "sp_username", defaultValue = "Guest", format = "Welcome: %s")
     String spString;
