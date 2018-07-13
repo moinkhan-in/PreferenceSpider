@@ -32,6 +32,11 @@ class ExampleActivity extends Activity {
   // some event on which you want to save shared preference.
   @OnClick(R.id.btnSave)
   void onSaveClicked() {
+  
+    // somehow you update the value.
+    spString = "Updated";
+    
+    // save this to shared preference.
     PreferenceSpider.write(this);
   }
 }
