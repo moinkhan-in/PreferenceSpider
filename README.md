@@ -1,11 +1,13 @@
 # PreferenceSpider
-Bind android shared preference values to varable.
+Bind android shared preference values to field.
+Read/Write operations of sharedpreferences are done using the only annotation.
 
 Field binding with shared preferences of Android which uses annotation processing to generate boilerplate
 code for you.
 
  * Eliminate creating of preference class by using `@Preference` on fields.
- * Eliminate resource lookups by using resource annotations on fields.
+ * Eliminate boilerplate code to read/write the preference code.
+ * Apply formating directly on preference.
 
 ```java
 class ExampleActivity extends Activity {
@@ -35,16 +37,33 @@ __Note: Above example will use the default shared preferences, if you want to us
   String spString;
 ```
 
-If you want to update all variable into shared preferences.
+Configure preference file name at application level, So that you don't have to provide it on each field.
+```java
+  public class MyApplication extends Application {
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        new PreferenceSpider.Builder(getApplicationContext())
+                .preferenceName("my_file")
+                .allowLog(true)
+                .build();
+    }
+  }
+```
+
+
+Update all fields into shared preferences.
 ```java
   PreferenceSpider.write(this);
 ```
 
-If you want to make preference field read only. (Applying `write` will not update that field into preference.)
+To make field read only. (Applying `write` will not update that field into preference.)
 ```java
   @Preference(key = "sp_boolean", defaultValue = "true", readOnly = true)
   boolean spBoolean;
 ```
+
 
 
 
