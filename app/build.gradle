@@ -24,7 +24,6 @@ android {
 
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation project(':preferencespider-annotations')
     implementation project(':preferencespider')
     annotationProcessor project(":preferencespider-compiler")
 
