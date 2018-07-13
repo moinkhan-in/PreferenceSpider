@@ -30,7 +30,7 @@ class ExampleActivity extends Activity {
 
 __Remember: A preferenceSpider is like ButterKnife only infinitely less sharp.__
 
-__Note: Above example will use the default shared preferences, if you want to user your own preference file name then,___
+__Note: Above example will use the default shared preferences, if you want to user your own preference file name then,__
 
 ```java
   @Preference(name = "my_file", key = "sp_string", defaultValue = "userDefault")
@@ -64,7 +64,14 @@ To make field read only. (Applying `write` will not update that field into prefe
   boolean spBoolean;
 ```
 
-
+You can also use the format attribute to make string.
+```java
+    @Preference(key = "sp_username", defaultValue = "Guest", format = "Welcome: %s")
+    String spString;
+```
+  - Currently format attribute is applicable on string preference.
+  - You can give only 1 format specifier, otherwise it crash as it intend too.
+  - Once you apply the format that field will become default readOnly. Because your preferece should not be overwrite with formatted string.
 
 
 Download
@@ -73,11 +80,8 @@ Download
 ```groovy
 dependencies {
   implementation 'in.moinkhan:preferencespider:alpha-2.0'
-  implementation 'in.moinkhan:preferencespider-annotations:alpha-2.0'
-  annotationProcessor "in.moinkhan:preferencespider-compiler:alpha-2.0" 
+  annotationProcessor 'in.moinkhan:preferencespider-compiler:alpha-2.0'
 }
 ```
-
-If you are using Kotlin, replace `annotationProcessor` with `kapt`.
 
 
