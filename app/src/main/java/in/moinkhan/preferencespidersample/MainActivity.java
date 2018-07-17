@@ -8,17 +8,38 @@ import in.moinkhan.preferencespider_annotations.Preference;
 
 public class MainActivity extends AppCompatActivity {
 
-    @Preference(key = "sp_string", defaultValue = "userDefault", format = "This is men.")
+    @Preference(key = "sp_string")
     String spString;
 
-    @Preference(name = "myfile", key = "sp_boolean", defaultValue = "true")
+    @Preference(key = "sp_int")
+    int spInt;
+
+    @Preference(key = "sp_double")
+    double spDouble;
+
+    @Preference(key = "sp_boolean")
     boolean spBoolean;
 
-    @Preference(key = "sp_float", defaultValue = "12.15f", readOnly = true)
+    @Preference(key = "sp_float", defaultValue = "12f")
     float spFloat;
 
-    @Preference(key = "sp_long", defaultValue = "1215L")
+    @Preference(key = "sp_long", defaultValue = "12")
     long spLong;
+
+    @Preference(key = "sp_int")
+    Integer spInt2;
+
+    @Preference(key = "sp_double")
+    Double spDouble2;
+
+    @Preference(key = "sp_boolean")
+    Boolean spBoolean2;
+
+    @Preference(key = "sp_float", defaultValue = "12f")
+    Float spFloat2;
+
+    @Preference(key = "sp_long", defaultValue = "12")
+    Long spLong2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

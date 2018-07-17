@@ -19,10 +19,12 @@ import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
+import javax.swing.text.DefaultCaret;
 import javax.tools.Diagnostic;
 
 import in.moinkhan.preferencespider_annotations.Preference;
@@ -147,63 +149,52 @@ public class PreferenceSpiderCompiler extends AbstractProcessor {
             hasError = true;
         }
 
+
         // verify default value
         Preference preference = (Preference) element.getAnnotation(annotationClass);
         String defaultValue = preference.defaultValue();
-        TypeMirror dataType = element.asType();
-
-        showMessage(dataType.getKind().toString() + "-> " + Boolean.class.getPackage());
         String format = preference.format();
-        if (dataType.getKind() == TypeKind.BOOLEAN) {
-            boolean isFormatApplicable = isFormatApplicable(format);
-            if (isFormatApplicable) {
-                error(enclosingElement, "Format is only applicable in string preference. (%s.%s)", enclosingElement.getQualifiedName(), element.getSimpleName());
-                hasError = true;
-            }
 
-            boolean isValid = isValidBoolean(defaultValue);
-            if (!isValid) {
-                error(enclosingElement, "Default value of %s %s is not valid boolean. (%s.%s)", annotationClass.getSimpleName(), targetThing, enclosingElement.getQualifiedName(), element.getSimpleName());
-                hasError = true;
-            }
-        } else if (dataType.getKind() == TypeKind.INT) {
-            boolean isFormatApplicable = isFormatApplicable(format);
-            if (isFormatApplicable) {
-                error(enclosingElement, "Format is only applicable in string preference. (%s.%s)", enclosingElement.getQualifiedName(), element.getSimpleName());
-                hasError = true;
-            }
-
-            boolean isValid = isValidInt(defaultValue);
-            if (!isValid) {
-                error(enclosingElement, "Default value of %s %s is not valid integer. (%s.%s)", annotationClass.getSimpleName(), targetThing, enclosingElement.getQualifiedName(), element.getSimpleName());
-                hasError = true;
-            }
-        } else if (dataType.getKind() == TypeKind.LONG) {
-            boolean isFormatApplicable = isFormatApplicable(format);
-            if (isFormatApplicable) {
-                error(enclosingElement, "Format is only applicable in string preference. (%s.%s)", enclosingElement.getQualifiedName(), element.getSimpleName());
-                hasError = true;
-            }
-
-            boolean isValid = isValidLong(defaultValue);
-            if (!isValid) {
-                error(enclosingElement, "Default value of %s %s is not valid long. (%s.%s)", annotationClass.getSimpleName(), targetThing, enclosingElement.getQualifiedName(), element.getSimpleName());
-                hasError = true;
-            }
-        } else if (dataType.getKind() == TypeKind.FLOAT) {
-            boolean isFormatApplicable = isFormatApplicable(format);
-            if (isFormatApplicable) {
-                error(enclosingElement, "Format is only applicable in string preference. (%s.%s)", enclosingElement.getQualifiedName(), element.getSimpleName());
-                hasError = true;
-            }
-
-            boolean isValid = isValidFloat(defaultValue);
-            if (!isValid) {
-                error(enclosingElement, "Default value of %s %s is not valid float. (%s.%s)", annotationClass.getSimpleName(), targetThing, enclosingElement.getQualifiedName(), element.getSimpleName());
-                hasError = true;
+        TypeMirror dataType = element.asType();
+        showMessage(dataType.toString());
+        if (dataType.getKind() != TypeKind.DECLARED) {
+            showMessage(String.format("%s -> %s", preference.key(), dataType));
+            if (!dataType.toString().equals("java.lang.String")) {
+                boolean isFormatApplicable = isFormatApplicable(format);
+                if (isFormatApplicable) {
+                    error(enclosingElement, "Format is only applicable in string preference. (%s.%s)", enclosingElement.getQualifiedName(), element.getSimpleName());
+                    hasError = true;
+                }
             }
         }
 
+        if (defaultValue.length() > 0) {
+            if (dataType.getKind() == TypeKind.BOOLEAN) {
+                boolean isValid = isValidBoolean(defaultValue);
+                if (!isValid) {
+                    error(enclosingElement, "Default value of %s %s is not valid boolean. (%s.%s)", annotationClass.getSimpleName(), targetThing, enclosingElement.getQualifiedName(), element.getSimpleName());
+                    hasError = true;
+                }
+            } else if (dataType.getKind() == TypeKind.INT) {
+                boolean isValid = isValidInt(defaultValue);
+                if (!isValid) {
+                    error(enclosingElement, "Default value of %s %s is not valid integer. (%s.%s)", annotationClass.getSimpleName(), targetThing, enclosingElement.getQualifiedName(), element.getSimpleName());
+                    hasError = true;
+                }
+            } else if (dataType.getKind() == TypeKind.LONG) {
+                boolean isValid = isValidLong(defaultValue);
+                if (!isValid) {
+                    error(enclosingElement, "Default value of %s %s is not valid long. (%s.%s)", annotationClass.getSimpleName(), targetThing, enclosingElement.getQualifiedName(), element.getSimpleName());
+                    hasError = true;
+                }
+            } else if (dataType.getKind() == TypeKind.FLOAT) {
+                boolean isValid = isValidFloat(defaultValue);
+                if (!isValid) {
+                    error(enclosingElement, "Default value of %s %s is not valid float. (%s.%s)", annotationClass.getSimpleName(), targetThing, enclosingElement.getQualifiedName(), element.getSimpleName());
+                    hasError = true;
+                }
+            }
+        }
 
         return hasError;
     }
@@ -222,13 +213,6 @@ public class PreferenceSpiderCompiler extends AbstractProcessor {
     }
 
     private boolean isValidLong(String defaultValue) {
-
-        if (defaultValue != null && defaultValue.trim().length() > 0) {
-            if (defaultValue.charAt(defaultValue.length() - 1) == 'L') {
-                defaultValue = defaultValue.substring(0, defaultValue.length() - 1);
-            }
-        }
-
         try {
             Long.parseLong(defaultValue);
             return true;

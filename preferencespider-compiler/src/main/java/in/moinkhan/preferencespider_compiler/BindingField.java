@@ -2,7 +2,12 @@ package in.moinkhan.preferencespider_compiler;
 
 import com.squareup.javapoet.CodeBlock;
 
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
+
+import in.moinkhan.preferencespider_compiler.stratagies.Strategy;
+import in.moinkhan.preferencespider_compiler.stratagies.StrategyFactory;
 
 /**
  * Created by moinkhan on 26-02-2018.
@@ -18,9 +23,10 @@ public class BindingField {
     private TypeMirror elementKind;
     private String defaultVal;
     private boolean readOnly = false;
+    private Strategy strategy;
 
-    public BindingField(String targetParam, String varName, String prefKey, String format, TypeMirror elementKind, String defaultVal, String prefName, boolean readOnly) {
-        this.targetParam = targetParam;
+    public BindingField(String targetClass, String varName, String prefKey, String format, TypeMirror elementKind, String defaultVal, String prefName, boolean readOnly) {
+        this.targetParam = targetClass;
         this.varName = varName;
         this.prefKey = prefKey;
         this.format = format;
@@ -28,12 +34,13 @@ public class BindingField {
         this.defaultVal = defaultVal;
         this.readOnly = isStringFormatApplicable() || readOnly;
         this.prefName = prefName;
+        this.strategy = new StrategyFactory(elementKind).getStrategy();
     }
 
     public CodeBlock readBlock() {
         String argument = "java.lang.String".equals(elementKind.toString()) ? "$S" : "$L";
         String variable = "$L.$L";
-        String expression = "prefUtils.readPreferenceValue($L, $S, " + argument + ")";
+        String expression = "prefUtils." + strategy.readMethodName() + "($L, $S, " + argument + ")";
         String formatWrapper = "String.format(\"" + format + "\", " + expression + ")";
 
         if (isStringFormatApplicable()) {
@@ -45,7 +52,7 @@ public class BindingField {
                 varName,
                 getPrefName(),
                 prefKey,
-                defaultVal
+                defaultVal.length() > 0 ? defaultVal : strategy.getDefaultValue()
         );
     }
 
@@ -55,7 +62,7 @@ public class BindingField {
             return CodeBlock.of("", "");
         }
 
-        return CodeBlock.of("$L.writePreferenceValue($L, $S, $L.$L);\n",
+        return CodeBlock.of("$L." + strategy.writeMethodName() + "($L, $S, $L.$L);\n",
                 "prefUtils",
                 getPrefName(),
                 prefKey,

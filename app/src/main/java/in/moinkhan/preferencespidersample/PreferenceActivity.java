@@ -7,8 +7,8 @@ import in.moinkhan.preferencespider_annotations.Preference;
 
 public class PreferenceActivity extends AppCompatActivity {
 
-    @Preference(key = "increment", defaultValue = "as", format = "asd")
-    String increment;
+//    @Preference(key = "increment", defaultValue = "as", format = "asd")
+//    String increment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
