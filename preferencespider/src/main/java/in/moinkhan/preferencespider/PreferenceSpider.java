@@ -50,7 +50,7 @@ public final class PreferenceSpider {
     }
 
     /**
-     * Preference annotated fields specified {@link android.support.v4.app.Fragment}.
+     * Preference annotated fields specified {@link Fragment}.
      *
      * @param fragment Target activity for preference reading.
      */
@@ -87,7 +87,7 @@ public final class PreferenceSpider {
     }
 
     /**
-     * Preference annotated fields specified {@link android.support.v4.app.Fragment}.
+     * Preference annotated fields specified {@link Fragment}.
      *
      * @param fragment Target activity for preference writing.
      */
