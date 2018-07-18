@@ -8,10 +8,10 @@ import in.moinkhan.preferencespider_annotations.Preference;
 
 public class MainActivity extends AppCompatActivity {
 
-    @Preference(key = "sp_string")
+    @Preference
     String spString;
 
-    @Preference(key = "sp_int")
+    @Preference
     int spInt;
 
     @Preference(key = "sp_double")
@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
     @Preference(key = "sp_double")
     Double spDouble2;
 
-    @Preference(key = "sp_boolean")
+    @Preference
     Boolean spBoolean2;
 
     @Preference(key = "sp_float", defaultValue = "12f")
@@ -47,7 +47,13 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         PreferenceSpider.read(this);
+
         spString = "Moinkhan";
+        spInt = 1200;
+        spInt2 = 130;
+        spFloat = 15.5f;
+        spFloat2 = 20.5f;
+
         PreferenceSpider.write(this);
     }
 }

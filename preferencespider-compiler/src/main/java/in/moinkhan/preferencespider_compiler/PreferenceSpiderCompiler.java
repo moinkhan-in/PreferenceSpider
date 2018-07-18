@@ -19,12 +19,10 @@ import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
-import javax.swing.text.DefaultCaret;
 import javax.tools.Diagnostic;
 
 import in.moinkhan.preferencespider_annotations.Preference;
@@ -90,11 +88,12 @@ public class PreferenceSpiderCompiler extends AbstractProcessor {
 
             for (Element prefElement : entry.getValue()) {
                 Preference prefAnnotation = prefElement.getAnnotation(Preference.class);
+                String key = prefAnnotation.key().length() > 0 ? prefAnnotation.key() : prefElement.getSimpleName().toString();
 
                 models.add(new BindingField(
                         className.toLowerCase(),
                         prefElement.getSimpleName().toString(),
-                        prefAnnotation.key(),
+                        key,
                         prefAnnotation.format(),
                         prefElement.asType(),
                         prefAnnotation.defaultValue(),
@@ -113,10 +112,6 @@ public class PreferenceSpiderCompiler extends AbstractProcessor {
                 error(classElement, "%s cannot write", classElement.getSimpleName());
             }
         }
-    }
-
-    private boolean validateElement(Element prefElement) {
-        return isInaccessibleViaGeneratedCode(Preference.class, "field", prefElement);
     }
 
     private boolean isInaccessibleViaGeneratedCode(Class<? extends Annotation> annotationClass,
@@ -149,6 +144,7 @@ public class PreferenceSpiderCompiler extends AbstractProcessor {
             hasError = true;
         }
 
+        // verify is it from supported type.
 
         // verify default value
         Preference preference = (Preference) element.getAnnotation(annotationClass);
@@ -156,7 +152,26 @@ public class PreferenceSpiderCompiler extends AbstractProcessor {
         String format = preference.format();
 
         TypeMirror dataType = element.asType();
-        showMessage(dataType.toString());
+        if (dataType.getKind().isPrimitive()) {
+            if (!Constants.SUPPORTED_PRIMITIVE_TYPES.contains(dataType.getKind())) {
+                error(enclosingElement, "%s %s is not supported on given type. (%s) (%s.%s)",
+                        annotationClass.getSimpleName(), targetThing,
+                        dataType.toString(),
+                        enclosingElement.getQualifiedName(),
+                        element.getSimpleName());
+                hasError = true;
+            }
+        } else if (dataType.getKind() == TypeKind.DECLARED) {
+            if (!Constants.SUPPORTED_OTHER_TYPES.contains(dataType.toString())) {
+                error(enclosingElement, "%s %s is not supported on given types. (%s) (%s.%s)",
+                        annotationClass.getSimpleName(), targetThing,
+                        dataType.toString(),
+                        enclosingElement.getQualifiedName(),
+                        element.getSimpleName());
+                hasError = true;
+            }
+        }
+
         if (dataType.getKind() != TypeKind.DECLARED) {
             showMessage(String.format("%s -> %s", preference.key(), dataType));
             if (!dataType.toString().equals("java.lang.String")) {
@@ -191,6 +206,12 @@ public class PreferenceSpiderCompiler extends AbstractProcessor {
                 boolean isValid = isValidFloat(defaultValue);
                 if (!isValid) {
                     error(enclosingElement, "Default value of %s %s is not valid float. (%s.%s)", annotationClass.getSimpleName(), targetThing, enclosingElement.getQualifiedName(), element.getSimpleName());
+                    hasError = true;
+                }
+            } else if (dataType.getKind() == TypeKind.DOUBLE) {
+                boolean isValid = isValidFloat(defaultValue);
+                if (!isValid) {
+                    error(enclosingElement, "Default value of %s %s is not valid double. (%s.%s)", annotationClass.getSimpleName(), targetThing, enclosingElement.getQualifiedName(), element.getSimpleName());
                     hasError = true;
                 }
             }

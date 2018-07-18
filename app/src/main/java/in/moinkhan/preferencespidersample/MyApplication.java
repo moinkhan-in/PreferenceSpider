@@ -13,8 +13,8 @@ public class MyApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        new PreferenceSpider.Builder(getApplicationContext())
-//                .preferenceName("moin")
+        PreferenceSpider.newBuilder()
+                .preferenceName("moin")
                 .allowLog(true)
                 .build();
     }

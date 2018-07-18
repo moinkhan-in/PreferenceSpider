@@ -10,4 +10,5 @@ public interface Imports {
     ClassName PREFERENCE_UTILS = ClassName.get("in.moinkhan.preferencespider", "PreferenceUtils");
     ClassName PREFERENCE_BINDER = ClassName.get("in.moinkhan.preferencespider", "PreferenceBinder");
     ClassName PREFERENCE_SPIDER = ClassName.get("in.moinkhan.preferencespider", "PreferenceSpider");
+    ClassName CONTEXT = ClassName.get("android.content", "Context");
 }

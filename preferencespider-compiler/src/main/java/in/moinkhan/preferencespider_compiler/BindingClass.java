@@ -33,6 +33,11 @@ public class BindingClass {
         MethodSpec.Builder readPreferenceValues = MethodSpec.methodBuilder("bindPreferenceValue");
         MethodSpec.Builder commitPreferenceValues = MethodSpec.methodBuilder("commitPreferenceValues");
 
+        if (varList != null && varList.size() > 0) {
+            readPreferenceValues.addCode(CodeBlock.of("$T prefUtils = $T.getInstance(context);\n", Imports.PREFERENCE_UTILS, Imports.PREFERENCE_UTILS));
+            commitPreferenceValues.addCode(CodeBlock.of("$T prefUtils = $T.getInstance(context);\n", Imports.PREFERENCE_UTILS, Imports.PREFERENCE_UTILS));
+        }
+
         for (BindingField bindingField : varList) {
             readPreferenceValues.addCode(bindingField.readBlock());
             commitPreferenceValues.addCode(bindingField.writeBlock());
@@ -41,23 +46,23 @@ public class BindingClass {
         readPreferenceValues
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
+                .addParameter(Imports.CONTEXT, "context")
                 .build();
 
         commitPreferenceValues
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
+                .addParameter(Imports.CONTEXT, "context")
                 .build();
 
         MethodSpec.Builder constructor = MethodSpec.constructorBuilder()
                 .addModifiers(Modifier.PUBLIC)
                 .addParameter(ClassName.get(typeElement), targetName.toLowerCase())
-                .addCode(CodeBlock.of("this.$L = $L;\n", targetName.toLowerCase(), targetName.toLowerCase()))
-                .addCode(CodeBlock.of("this.$L = $T.$L;\n", "prefUtils", Imports.PREFERENCE_UTILS, "getInstance("+ targetName.toLowerCase() +")"));
+                .addCode(CodeBlock.of("this.$L = $L;\n", targetName.toLowerCase(), targetName.toLowerCase()));
 
         return TypeSpec.classBuilder(targetName + "_PreferenceSpider")
                 .addSuperinterface(Imports.PREFERENCE_BINDER)
                 .addField(FieldSpec.builder(ClassName.get(typeElement), targetName.toLowerCase(), Modifier.PRIVATE).build())
-                .addField(FieldSpec.builder(Imports.PREFERENCE_UTILS, "prefUtils", Modifier.PRIVATE).build())
                 .addMethod(constructor.build())
                 .addMethod(readPreferenceValues.build())
                 .addMethod(commitPreferenceValues.build())

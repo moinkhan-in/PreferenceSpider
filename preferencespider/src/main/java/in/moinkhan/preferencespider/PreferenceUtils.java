@@ -7,8 +7,6 @@ import android.util.Log;
 
 import java.util.Locale;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class PreferenceUtils {
 
@@ -27,7 +25,7 @@ public class PreferenceUtils {
     }
 
     private void logInfo(String log) {
-        if (PreferenceSpider.getInstance(mContext).isAllowLog()) {
+        if (PreferenceSpider.getInstance().isAllowLog()) {
             Log.d("PreferenceSpider", log);
         }
     }
@@ -48,7 +46,7 @@ public class PreferenceUtils {
 
     // int
     public void writeInt(String prefName, String prefsKey, int prefsValue) {
-        logInfo(String.format(Locale.getDefault(), ">>> Name -> %s, Key -> %d, value -> %d", prefName == null ? "'Default'" : prefName, prefsKey, prefsValue));
+        logInfo(String.format(Locale.getDefault(), ">>> Name -> %s, Key -> %s, value -> %d", prefName == null ? "'Default'" : prefName, prefsKey, prefsValue));
         getPrefsEditor(prefName)
                 .putInt(prefsKey, prefsValue)
                 .commit();
@@ -98,7 +96,7 @@ public class PreferenceUtils {
 
     public double readDouble(String prefName, String prefsKey, double defaultValue) {
         double val = Double.longBitsToDouble(getPrefs(prefName).getLong(prefsKey, Double.doubleToRawLongBits(defaultValue)));
-        logInfo(String.format(Locale.getDefault(), "<<< Name -> %s, Key -> %s, value -> %d, Default value -> %d", prefName == null ? "'Default'" : prefName, prefsKey, val, defaultValue));
+        logInfo(String.format(Locale.getDefault(), "<<< Name -> %s, Key -> %s, value -> %f, Default value -> %f", prefName == null ? "'Default'" : prefName, prefsKey, val, defaultValue));
         return val;
     }
 
@@ -131,6 +129,7 @@ public class PreferenceUtils {
     }
 
     private SharedPreferences getPrefs(String prefName) {
+        prefName = prefName == null ? PreferenceSpider.getInstance().getPreferenceName() : prefName;
         if (prefName == null) {
             return PreferenceManager.getDefaultSharedPreferences(mContext);
         } else {
@@ -139,11 +138,7 @@ public class PreferenceUtils {
     }
 
     private SharedPreferences.Editor getPrefsEditor(String prefName) {
-        if (prefName == null) {
-            return PreferenceManager.getDefaultSharedPreferences(mContext).edit();
-        } else {
-            return mContext.getSharedPreferences(prefName, Context.MODE_PRIVATE).edit();
-        }
+        return getPrefs(prefName).edit();
     }
 
 }

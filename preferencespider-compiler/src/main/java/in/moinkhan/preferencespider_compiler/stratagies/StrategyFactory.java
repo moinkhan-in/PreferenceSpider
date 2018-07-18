@@ -1,23 +1,15 @@
 package in.moinkhan.preferencespider_compiler.stratagies;
 
-import java.util.HashMap;
-
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
+
+import in.moinkhan.preferencespider_compiler.Constants;
 
 /**
  * Created by moin on 17/7/18.
  */
 
 public class StrategyFactory {
-
-    private static final HashMap<String, TypeKind> TYPES_KINDS = new HashMap<String, TypeKind>() {{
-        put("java.lang.Long", TypeKind.LONG);
-        put("java.lang.Double", TypeKind.DOUBLE);
-        put("java.lang.Integer", TypeKind.INT);
-        put("java.lang.Float", TypeKind.FLOAT);
-        put("java.lang.Boolean", TypeKind.BOOLEAN);
-    }};
 
     public TypeMirror dataType;
 
@@ -30,7 +22,7 @@ public class StrategyFactory {
             if (dataType.toString().equalsIgnoreCase("java.lang.String")) {
                 return new StringStrategy();
             }
-            return getByTypeKind(TYPES_KINDS.get(dataType.toString()));
+            return getByTypeKind(Constants.SUPPORTED_DECLARED_TYPES.get(dataType.toString()));
         } else {
             return getByTypeKind(dataType.getKind());
         }

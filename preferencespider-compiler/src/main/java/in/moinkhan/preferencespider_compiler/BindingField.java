@@ -2,8 +2,6 @@ package in.moinkhan.preferencespider_compiler;
 
 import com.squareup.javapoet.CodeBlock;
 
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 
 import in.moinkhan.preferencespider_compiler.stratagies.Strategy;
@@ -62,8 +60,7 @@ public class BindingField {
             return CodeBlock.of("", "");
         }
 
-        return CodeBlock.of("$L." + strategy.writeMethodName() + "($L, $S, $L.$L);\n",
-                "prefUtils",
+        return CodeBlock.of("prefUtils." + strategy.writeMethodName() + "($L, $S, $L.$L);\n",
                 getPrefName(),
                 prefKey,
                 targetParam,
@@ -77,7 +74,7 @@ public class BindingField {
 
     public String getPrefName() {
         if (prefName == null || prefName.trim().length() == 0) {
-            return CodeBlock.of("$T.getInstance(" + targetParam + ").getPreferenceName()", Imports.PREFERENCE_SPIDER).toString();
+            return null;
         } else {
             return "\"" + prefName + "\"";
         }
