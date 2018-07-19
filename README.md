@@ -1,6 +1,6 @@
 # PreferenceSpider
 Bind android shared preference values to field.
-Read/Write operations of sharedpreferences are done using the only annotation.
+Read/Write operations of shared preferences are done using the only annotation.
 
 __Remember: The PreferenceSpider is like ButterKnife, But this library bind sharedpreferences.__
 
@@ -9,8 +9,8 @@ Download
 
 ```groovy
 dependencies {
-  implementation 'in.moinkhan:preferencespider:alpha-2.2'
-  annotationProcessor 'in.moinkhan:preferencespider-compiler:alpha-2.2'
+  implementation 'in.moinkhan:preferencespider:alpha-2.3'
+  annotationProcessor 'in.moinkhan:preferencespider-compiler:alpha-2.3'
 }
 ```
 
@@ -21,20 +21,24 @@ code for you.
  * It use code generation instead of reflection to make it faster.
  * Use the preference singleton class for memory efficiency.
  * Eliminate boilerplate code to read/write the preference code.
- * Apply formatting directly on preference.
+ * Apply string formatting directly on preference.
+ * Can use with your existing preferences.
+ * Use native shared preference.
 
 ```java
 class ExampleActivity extends Activity {
 
-  @Preference(key = "sp_string", defaultValue = "userDefault")
-  String spString;
-  
-  @Preference(key = "sp_boolean", defaultValue = "true")
-  boolean spBoolean;
-
-  // it will use variable name as preference key.
+  // Use field name as preference key ie. 'spInt', and default shared preference file.
   @Preference
   Integer spInt;
+
+  // Use given key as preference key, and default shared preference file.
+  @Preference(key = "sp_string")
+  String spString;
+
+  // Use given key as preference key, and return given default value if not found.
+  @Preference(key = "sp_boolean", defaultValue = "true")
+  boolean spBoolean;
 
   @Override public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -66,13 +70,10 @@ class ExampleActivity extends Activity {
     @Preference(key = "spUserName")
     String userName;
 
-    private Context context;
-
-    SampleAdapter(Context context) {
-      this.context = context;
+    ExampleAdapter(Context context) {
       // ...
       PreferenceSpider.read(this, context);
-
+      // ...
     }
 
     // .....
@@ -80,7 +81,7 @@ class ExampleActivity extends Activity {
 
 ```
 
-__Note: Above example will use the default shared preferences, If you want to use your preference file name then,__
+__You can use `name` attribute to retrieve field from custom preference file name,__
 
 ```java
   @Preference(name = "my_file", key = "sp_string", defaultValue = "userDefault")
@@ -103,7 +104,7 @@ Configure preference file name at application level, So that you don't have to p
 ```
 
 
-Update all fields into shared preferences.
+Update all fields into shared preferences with their respective keys.
 ```java
   PreferenceSpider.write(this);
 ```
@@ -122,6 +123,92 @@ You can also use the `format` attribute to make formatted string. e.g Welcome: [
   - Currently format attribute is only applicable on string preference.
   - You can give only 1 format specifier, otherwise it throws `MissingArgumentException` as preference contain single value.
   - Once you apply the format that field will become default readOnly. Because your preferece should not be overwrite with formatted string.
+
+#### Don't want to use annotations, I created a singleton preference helper class for you.
+
+```java
+  int spInt = PreferenceUtils.getInstance(context).readInt("sp_int");
+```
+
+###### You can use following methods.
+```java
+  boolean readBoolean(String prefsKey)
+
+  boolean readBoolean(String prefsKey, boolean defaultValue)
+
+  boolean readBoolean(String prefName, String prefsKey, boolean defaultValue)
+
+  void writeBoolean(String prefsKey, boolean prefsValue)
+
+  void writeBoolean(String prefName, String prefsKey, boolean prefsValue)
+
+
+  double readDouble(String prefsKey)
+
+  double readDouble(String prefsKey, double defaultValue)
+
+  double readDouble(String prefName, String prefsKey, double defaultValue)
+
+  void writeDouble(String prefsKey, double prefsValue)
+
+  void writeDouble(String prefName, String prefsKey, double prefsValue)
+
+
+  float readFloat(String prefsKey)
+
+  float readFloat(String prefsKey, float defaultValue)
+
+  float readFloat(String prefName, String prefsKey, float defaultValue)
+
+  void writeFloat(String prefsKey, float prefsValue)
+
+  void writeFloat(String prefName, String prefsKey, float prefsValue)
+
+
+  int readInt(String prefsKey)
+
+  int readInt(String prefsKey, int defaultValue)
+
+  int readInt(String prefName, String prefsKey, int defaultValue)
+
+  void writeInt(String prefsKey, int prefsValue)
+
+  void writeInt(String prefName, String prefsKey, int prefsValue)
+
+
+  long readLong(String prefsKey)
+
+  long readLong(String prefsKey, long defaultValue)
+
+  long readLong(String prefName, String prefsKey, long defaultValue)
+
+  void writeLong(String prefsKey, long prefsValue)
+
+  void writeLong(String prefName, String prefsKey, long prefsValue)
+
+
+  String readString(String prefsKey)
+
+  String readString(String prefsKey, String defaultValue)
+
+  String readString(String prefName, String prefsKey, String defaultValue)
+
+  void writeString(String prefsKey, String prefsValue)
+
+  void writeString(String prefName, String prefsKey, String prefsValue)
+
+
+  Set<String> readStringSet(String prefsKey)
+
+  Set<String> readStringSet(String prefsKey, Set<String> defaultValue)
+
+  Set<String> readStringSet(String prefName, String prefsKey, Set<String> defaultValue)
+
+  void writeStringSet(String prefsKey, Set<String> prefsValue)
+
+  void writeStringSet(String prefName, String prefsKey, Set<String> prefsValue)
+
+```
 
 
 Licence

@@ -3,6 +3,7 @@ package in.moinkhan.preferencespider;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
+import android.support.annotation.NonNull;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -109,7 +110,7 @@ public final class PreferenceSpider {
         return new Builder();
     }
 
-    public String getPreferenceName() {
+    String getPreferenceName() {
         return preferenceName;
     }
 
@@ -121,7 +122,7 @@ public final class PreferenceSpider {
         return allowLog;
     }
 
-    public void setAllowLog(boolean allowLog) {
+    void setAllowLog(boolean allowLog) {
         this.allowLog = allowLog;
     }
 
@@ -176,7 +177,10 @@ public final class PreferenceSpider {
         private Builder() {
         }
 
-        public Builder preferenceName(String preferenceName) {
+        public Builder preferenceName(@NonNull String preferenceName) {
+            if (preferenceName != null && preferenceName.trim().length() == 0) {
+                throw new IllegalArgumentException("Preference file name should be valid.");
+            }
             this.preferenceName = preferenceName;
             return this;
         }

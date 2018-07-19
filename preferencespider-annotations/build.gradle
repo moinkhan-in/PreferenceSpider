@@ -15,7 +15,7 @@ ext {
     siteUrl = 'https://github.com/msquare097'
     gitUrl = 'https://m_pathan@bitbucket.org/m_pathan/preferencespider.git'
 
-    libraryVersion = 'alpha-2.2'
+    libraryVersion = 'alpha-2.3'
 
     developerId = 'msquare'
     developerName = 'Moinkhan Pathan'
