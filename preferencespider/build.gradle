@@ -15,7 +15,7 @@ ext {
     siteUrl = 'https://github.com/msquare097'
     gitUrl = 'https://m_pathan@bitbucket.org/m_pathan/preferencespider.git'
 
-    libraryVersion = 'alpha-2.3'
+    libraryVersion = 'alpha-2.4'
 
     developerId = 'msquare'
     developerName = 'Moinkhan Pathan'
@@ -52,6 +52,8 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     implementation 'com.android.support:appcompat-v7:26.1.0'
+    implementation 'com.google.code.gson:gson:2.8.5'
+
     api project(path: ':preferencespider-annotations')
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'

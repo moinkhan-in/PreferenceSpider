@@ -1,8 +1,6 @@
 package in.moinkhan.preferencespider_compiler;
 
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
 
 import javax.lang.model.type.TypeKind;
 
@@ -12,26 +10,27 @@ import javax.lang.model.type.TypeKind;
 
 public class Constants {
 
-    public static final HashMap<String, TypeKind> SUPPORTED_DECLARED_TYPES = new HashMap<String, TypeKind>() {{
-        put("java.lang.Long", TypeKind.LONG);
-        put("java.lang.Double", TypeKind.DOUBLE);
-        put("java.lang.Integer", TypeKind.INT);
-        put("java.lang.Float", TypeKind.FLOAT);
-        put("java.lang.Boolean", TypeKind.BOOLEAN);
+    public static final HashMap<String, Type> SUPPORTED_TYPES = new HashMap<String, Type>() {{
+        put(TypeKind.LONG.toString(), Type.LONG);
+        put(TypeKind.DOUBLE.toString(), Type.DOUBLE);
+        put(TypeKind.INT.toString(), Type.INT);
+        put(TypeKind.FLOAT.toString(), Type.FLOAT);
+        put(TypeKind.BOOLEAN.toString(), Type.BOOLEAN);
+        put("java.lang.Long", Type.LONG);
+        put("java.lang.Double", Type.DOUBLE);
+        put("java.lang.Integer", Type.INT);
+        put("java.lang.Float", Type.FLOAT);
+        put("java.lang.Boolean", Type.BOOLEAN);
+        put("java.lang.String", Type.STRING);
     }};
-    public static final Set<String> SUPPORTED_OTHER_TYPES = new HashSet<String>() {{
-        add("java.lang.Long");
-        add("java.lang.Double");
-        add("java.lang.Integer");
-        add("java.lang.Float");
-        add("java.lang.Boolean");
-        add("java.lang.String");
-    }};
-    static final Set<TypeKind> SUPPORTED_PRIMITIVE_TYPES = new HashSet<TypeKind>() {{
-        add(TypeKind.DOUBLE);
-        add(TypeKind.FLOAT);
-        add(TypeKind.INT);
-        add(TypeKind.LONG);
-        add(TypeKind.BOOLEAN);
-    }};
+
+    public enum Type {
+        LONG,
+        DOUBLE,
+        INT,
+        FLOAT,
+        BOOLEAN,
+        STRING,
+        OTHER,
+    }
 }

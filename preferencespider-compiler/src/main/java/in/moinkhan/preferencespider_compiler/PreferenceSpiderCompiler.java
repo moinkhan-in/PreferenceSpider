@@ -19,7 +19,6 @@ import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
@@ -44,6 +43,17 @@ public class PreferenceSpiderCompiler extends AbstractProcessor {
         filer = processingEnvironment.getFiler();
         elementUtils = processingEnvironment.getElementUtils();
         typeUtils = processingEnvironment.getTypeUtils();
+    }
+
+    @Override
+    public Set<String> getSupportedAnnotationTypes() {
+        return super.getSupportedAnnotationTypes();
+    }
+
+    private Set<Class<? extends Annotation>> getSupportedAnnotations() {
+        Set<Class<? extends Annotation>> annotations = new HashSet<>();
+        annotations.add(Preference.class);
+        return annotations;
     }
 
     @Override
@@ -91,11 +101,12 @@ public class PreferenceSpiderCompiler extends AbstractProcessor {
                 String key = prefAnnotation.key().length() > 0 ? prefAnnotation.key() : prefElement.getSimpleName().toString();
 
                 models.add(new BindingField(
+                        prefElement.asType().toString(),
                         className.toLowerCase(),
                         prefElement.getSimpleName().toString(),
                         key,
                         prefAnnotation.format(),
-                        prefElement.asType(),
+                        getOurTypeByTypeMirror(prefElement.asType()),
                         prefAnnotation.defaultValue(),
                         prefAnnotation.name(),
                         prefAnnotation.readOnly()
@@ -151,64 +162,40 @@ public class PreferenceSpiderCompiler extends AbstractProcessor {
         String defaultValue = preference.defaultValue();
         String format = preference.format();
 
-        TypeMirror dataType = element.asType();
-        if (dataType.getKind().isPrimitive()) {
-            if (!Constants.SUPPORTED_PRIMITIVE_TYPES.contains(dataType.getKind())) {
-                error(enclosingElement, "%s %s is not supported on given type. (%s) (%s.%s)",
-                        annotationClass.getSimpleName(), targetThing,
-                        dataType.toString(),
-                        enclosingElement.getQualifiedName(),
-                        element.getSimpleName());
-                hasError = true;
-            }
-        } else if (dataType.getKind() == TypeKind.DECLARED) {
-            if (!Constants.SUPPORTED_OTHER_TYPES.contains(dataType.toString())) {
-                error(enclosingElement, "%s %s is not supported on given types. (%s) (%s.%s)",
-                        annotationClass.getSimpleName(), targetThing,
-                        dataType.toString(),
-                        enclosingElement.getQualifiedName(),
-                        element.getSimpleName());
-                hasError = true;
-            }
-        }
+        Constants.Type type = getOurTypeByTypeMirror(element.asType());
 
-        if (dataType.getKind() != TypeKind.DECLARED) {
-            showMessage(String.format("%s -> %s", preference.key(), dataType));
-            if (!dataType.toString().equals("java.lang.String")) {
-                boolean isFormatApplicable = isFormatApplicable(format);
-                if (isFormatApplicable) {
-                    error(enclosingElement, "Format is only applicable in string preference. (%s.%s)", enclosingElement.getQualifiedName(), element.getSimpleName());
-                    hasError = true;
-                }
-            }
+        boolean isFormatApplicable = isFormatApplicable(format);
+        if (isFormatApplicable && type != Constants.Type.STRING) {
+            error(enclosingElement, "Format is only applicable in string preference. (%s.%s)", enclosingElement.getQualifiedName(), element.getSimpleName());
+            hasError = true;
         }
 
         if (defaultValue.length() > 0) {
-            if (dataType.getKind() == TypeKind.BOOLEAN) {
+            if (type == Constants.Type.BOOLEAN) {
                 boolean isValid = isValidBoolean(defaultValue);
                 if (!isValid) {
                     error(enclosingElement, "Default value of %s %s is not valid boolean. (%s.%s)", annotationClass.getSimpleName(), targetThing, enclosingElement.getQualifiedName(), element.getSimpleName());
                     hasError = true;
                 }
-            } else if (dataType.getKind() == TypeKind.INT) {
+            } else if (type == Constants.Type.INT) {
                 boolean isValid = isValidInt(defaultValue);
                 if (!isValid) {
                     error(enclosingElement, "Default value of %s %s is not valid integer. (%s.%s)", annotationClass.getSimpleName(), targetThing, enclosingElement.getQualifiedName(), element.getSimpleName());
                     hasError = true;
                 }
-            } else if (dataType.getKind() == TypeKind.LONG) {
+            } else if (type == Constants.Type.LONG) {
                 boolean isValid = isValidLong(defaultValue);
                 if (!isValid) {
                     error(enclosingElement, "Default value of %s %s is not valid long. (%s.%s)", annotationClass.getSimpleName(), targetThing, enclosingElement.getQualifiedName(), element.getSimpleName());
                     hasError = true;
                 }
-            } else if (dataType.getKind() == TypeKind.FLOAT) {
+            } else if (type == Constants.Type.FLOAT) {
                 boolean isValid = isValidFloat(defaultValue);
                 if (!isValid) {
                     error(enclosingElement, "Default value of %s %s is not valid float. (%s.%s)", annotationClass.getSimpleName(), targetThing, enclosingElement.getQualifiedName(), element.getSimpleName());
                     hasError = true;
                 }
-            } else if (dataType.getKind() == TypeKind.DOUBLE) {
+            } else if (type == Constants.Type.DOUBLE) {
                 boolean isValid = isValidFloat(defaultValue);
                 if (!isValid) {
                     error(enclosingElement, "Default value of %s %s is not valid double. (%s.%s)", annotationClass.getSimpleName(), targetThing, enclosingElement.getQualifiedName(), element.getSimpleName());
@@ -218,6 +205,15 @@ public class PreferenceSpiderCompiler extends AbstractProcessor {
         }
 
         return hasError;
+    }
+
+    private Constants.Type getOurTypeByTypeMirror(TypeMirror dataType) {
+        String strType = dataType.getKind().isPrimitive() ? dataType.getKind().toString() : dataType.toString();
+        if (Constants.SUPPORTED_TYPES.containsKey(strType)) {
+            return Constants.SUPPORTED_TYPES.get(strType);
+        }
+
+        return Constants.Type.OTHER;
     }
 
     private boolean isFormatApplicable(String format) {

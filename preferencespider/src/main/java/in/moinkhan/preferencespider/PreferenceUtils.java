@@ -5,6 +5,9 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import com.google.gson.Gson;
+
+import java.lang.reflect.Type;
 import java.util.Locale;
 import java.util.Set;
 
@@ -212,8 +215,24 @@ public final class PreferenceUtils {
         return readBoolean(null, prefsKey, false);
     }
 
+    public <T> T read(String prefsKey, Type type) {
+        return read(null, prefsKey, type);
+    }
+
+    public <T> T read(String prefName, String prefsKey, Type type) {
+        return new Gson().fromJson(readString(prefName, prefsKey, null), type);
+    }
+
+    public void write(String prefsKey, Object prefVal) {
+        write(null, prefsKey, prefVal);
+    }
+
+    public void write(String prefName, String prefsKey, Object prefVal) {
+        writeString(prefName, prefsKey, new Gson().toJson(prefVal));
+    }
+
     private SharedPreferences getPrefs(String prefName) {
-        prefName = prefName == null ? PreferenceSpider.getInstance().getPreferenceName() : prefName;
+        prefName = prefName == null || prefName.trim().length() == 0 ? PreferenceSpider.getInstance().getPreferenceName() : prefName;
         if (prefName == null) {
             return PreferenceManager.getDefaultSharedPreferences(mContext);
         } else {
