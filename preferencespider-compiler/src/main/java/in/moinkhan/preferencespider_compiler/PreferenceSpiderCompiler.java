@@ -97,13 +97,14 @@ public class PreferenceSpiderCompiler extends AbstractProcessor {
             bindingClass.setVarList(models);
 
             for (Element prefElement : entry.getValue()) {
+
                 Preference prefAnnotation = prefElement.getAnnotation(Preference.class);
-                String key = prefAnnotation.key().length() > 0 ? prefAnnotation.key() : prefElement.getSimpleName().toString();
+                String varName = prefElement.getSimpleName().toString();
+                String key = prefAnnotation.key().length() > 0 ? prefAnnotation.key() : varName;
 
                 models.add(new BindingField(
                         prefElement.asType().toString(),
-                        className.toLowerCase(),
-                        prefElement.getSimpleName().toString(),
+                        String.format("%s.%s", className.toLowerCase(), varName),
                         key,
                         prefAnnotation.format(),
                         getOurTypeByTypeMirror(prefElement.asType()),

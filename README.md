@@ -9,8 +9,8 @@ Download
 
 ```groovy
 dependencies {
-  implementation 'in.moinkhan:preferencespider:alpha-2.4'
-  annotationProcessor 'in.moinkhan:preferencespider-compiler:alpha-2.4'
+  implementation 'in.moinkhan:preferencespider:alpha-2.5'
+  annotationProcessor 'in.moinkhan:preferencespider-compiler:alpha-2.5'
 }
 ```
 
@@ -130,7 +130,7 @@ You can also use the `format` attribute to make formatted string. e.g Welcome: [
 ```java
   int spInt = PreferenceUtils.getInstance(context).readInt("sp_int");
 
-  User user = PreferenceUtils.getInstance(this).read("spUser", User.class);
+  User user = PreferenceUtils.getInstance(context).read("spUser", User.class);
 ```
 
 ###### You can use following methods.

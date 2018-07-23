@@ -21,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
     @Preference(key = "sp_double")
     double spDouble;
 
-    @Preference(key = "sp_boolean")
+    @Preference(name = "  ", key = "sp_boolean")
     boolean spBoolean;
 
     @Preference(key = "sp_float", defaultValue = "12f")

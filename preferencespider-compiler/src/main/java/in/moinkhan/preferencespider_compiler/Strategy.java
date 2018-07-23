@@ -11,4 +11,6 @@ public interface Strategy {
     CodeBlock readBlock();
 
     CodeBlock writeBlock();
+
+    String getDefaultValue();
 }
