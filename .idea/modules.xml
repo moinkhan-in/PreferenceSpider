@@ -4,8 +4,8 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/PreferenceSpiderSample.iml" filepath="$PROJECT_DIR$/PreferenceSpiderSample.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/preferencespider/preferencespider.iml" filepath="$PROJECT_DIR$/preferencespider/preferencespider.iml" />
       <module fileurl="file://$PROJECT_DIR$/preferencespider.iml" filepath="$PROJECT_DIR$/preferencespider.iml" />
+      <module fileurl="file://$PROJECT_DIR$/preferencespider/preferencespider.iml" filepath="$PROJECT_DIR$/preferencespider/preferencespider.iml" />
       <module fileurl="file://$PROJECT_DIR$/preferencespider-annotations/preferencespider-annotations.iml" filepath="$PROJECT_DIR$/preferencespider-annotations/preferencespider-annotations.iml" />
       <module fileurl="file://$PROJECT_DIR$/preferencespider-compiler/preferencespider-compiler.iml" filepath="$PROJECT_DIR$/preferencespider-compiler/preferencespider-compiler.iml" />
       <module fileurl="file://$PROJECT_DIR$/preferencespider/preferencespider-preferencespider.iml" filepath="$PROJECT_DIR$/preferencespider/preferencespider-preferencespider.iml" />

@@ -9,8 +9,8 @@ Download
 
 ```groovy
 dependencies {
-  implementation 'in.moinkhan:preferencespider:alpha-2.3'
-  annotationProcessor 'in.moinkhan:preferencespider-compiler:alpha-2.3'
+  implementation 'in.moinkhan:preferencespider:alpha-2.4'
+  annotationProcessor 'in.moinkhan:preferencespider-compiler:alpha-2.4'
 }
 ```
 
@@ -21,9 +21,10 @@ code for you.
  * It use code generation instead of reflection to make it faster.
  * Use the preference singleton class for memory efficiency.
  * Eliminate boilerplate code to read/write the preference code.
- * Apply string formatting directly on preference.
+ * Apply string formatting on preference.
  * Can use with your existing preferences.
  * Use native shared preference.
+ * Can store object also.
 
 ```java
 class ExampleActivity extends Activity {
@@ -33,8 +34,8 @@ class ExampleActivity extends Activity {
   Integer spInt;
 
   // Use given key as preference key, and default shared preference file.
-  @Preference(key = "sp_string")
-  String spString;
+  @Preference(key = "sp_user")
+  User spUser;
 
   // Use given key as preference key, and return given default value if not found.
   @Preference(key = "sp_boolean", defaultValue = "true")
@@ -53,7 +54,7 @@ class ExampleActivity extends Activity {
   void onSaveClicked() {
   
     // somehow you update the value.
-    spString = "Updated";
+    spUser = new User(1, "TestUSer");
     spBoolean = false;
     spInt = 50;
     
@@ -128,10 +129,23 @@ You can also use the `format` attribute to make formatted string. e.g Welcome: [
 
 ```java
   int spInt = PreferenceUtils.getInstance(context).readInt("sp_int");
+
+  User user = PreferenceUtils.getInstance(this).read("spUser", User.class);
 ```
 
 ###### You can use following methods.
 ```java
+  // custom object
+
+  <T> T read(String prefsKey, Type type)
+
+  <T> T read(String prefName, String prefsKey, Type type)
+
+  void write(String prefsKey, Object prefVal)
+
+  void write(String prefName, String prefsKey, Object prefVal)
+
+  // boolean
   boolean readBoolean(String prefsKey)
 
   boolean readBoolean(String prefsKey, boolean defaultValue)
@@ -142,7 +156,7 @@ You can also use the `format` attribute to make formatted string. e.g Welcome: [
 
   void writeBoolean(String prefName, String prefsKey, boolean prefsValue)
 
-
+  // double
   double readDouble(String prefsKey)
 
   double readDouble(String prefsKey, double defaultValue)
@@ -153,7 +167,7 @@ You can also use the `format` attribute to make formatted string. e.g Welcome: [
 
   void writeDouble(String prefName, String prefsKey, double prefsValue)
 
-
+  // float
   float readFloat(String prefsKey)
 
   float readFloat(String prefsKey, float defaultValue)
@@ -164,7 +178,7 @@ You can also use the `format` attribute to make formatted string. e.g Welcome: [
 
   void writeFloat(String prefName, String prefsKey, float prefsValue)
 
-
+  // integer
   int readInt(String prefsKey)
 
   int readInt(String prefsKey, int defaultValue)
@@ -175,7 +189,7 @@ You can also use the `format` attribute to make formatted string. e.g Welcome: [
 
   void writeInt(String prefName, String prefsKey, int prefsValue)
 
-
+  // long
   long readLong(String prefsKey)
 
   long readLong(String prefsKey, long defaultValue)
@@ -186,7 +200,7 @@ You can also use the `format` attribute to make formatted string. e.g Welcome: [
 
   void writeLong(String prefName, String prefsKey, long prefsValue)
 
-
+  // string
   String readString(String prefsKey)
 
   String readString(String prefsKey, String defaultValue)
@@ -197,7 +211,7 @@ You can also use the `format` attribute to make formatted string. e.g Welcome: [
 
   void writeString(String prefName, String prefsKey, String prefsValue)
 
-
+  // String set
   Set<String> readStringSet(String prefsKey)
 
   Set<String> readStringSet(String prefsKey, Set<String> defaultValue)
