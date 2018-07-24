@@ -2,6 +2,7 @@ package in.moinkhan.preferencespidersample;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.TextView;
 
 import in.moinkhan.preferencespider.PreferenceSpider;
 import in.moinkhan.preferencespider.PreferenceUtils;
@@ -48,10 +49,15 @@ public class MainActivity extends AppCompatActivity {
     @Preference
     User spUser3;
 
+    @Preference(key = "spString2", format = "Welcome: %s", defaultValue = "Guest")
+    TextView tvUserName;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        tvUserName = findViewById(R.id.tv_my);
 
         PreferenceSpider.read(this);
 

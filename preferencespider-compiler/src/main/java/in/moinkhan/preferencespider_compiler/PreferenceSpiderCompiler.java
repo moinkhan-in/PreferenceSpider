@@ -8,6 +8,7 @@ import java.lang.annotation.Annotation;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -15,7 +16,6 @@ import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
-import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
@@ -30,7 +30,6 @@ import static javax.lang.model.element.ElementKind.CLASS;
 import static javax.lang.model.element.Modifier.PRIVATE;
 import static javax.lang.model.element.Modifier.STATIC;
 
-@SupportedAnnotationTypes("in.moinkhan.preferencespider_annotations.Preference")
 public class PreferenceSpiderCompiler extends AbstractProcessor {
 
     private Filer filer;
@@ -47,7 +46,12 @@ public class PreferenceSpiderCompiler extends AbstractProcessor {
 
     @Override
     public Set<String> getSupportedAnnotationTypes() {
-        return super.getSupportedAnnotationTypes();
+        Set<String> annotations = new HashSet<>();
+        for (Class<? extends Annotation> annotation : getSupportedAnnotations()) {
+            annotations.add(annotation.getCanonicalName());
+        }
+
+        return annotations;
     }
 
     private Set<Class<? extends Annotation>> getSupportedAnnotations() {
@@ -102,12 +106,17 @@ public class PreferenceSpiderCompiler extends AbstractProcessor {
                 String varName = prefElement.getSimpleName().toString();
                 String key = prefAnnotation.key().length() > 0 ? prefAnnotation.key() : varName;
 
+                Constants.DataType dataType = getDataTypeByTypeMirror(prefElement.asType());
+                Constants.FieldType fieldType = getFieldTypeByTypeMirror(prefElement.asType());
+
+                showMessage(dataType.name() + " -> " + fieldType.name());
                 models.add(new BindingField(
                         prefElement.asType().toString(),
                         String.format("%s.%s", className.toLowerCase(), varName),
                         key,
                         prefAnnotation.format(),
-                        getOurTypeByTypeMirror(prefElement.asType()),
+                        fieldType,
+                        dataType,
                         prefAnnotation.defaultValue(),
                         prefAnnotation.name(),
                         prefAnnotation.readOnly()
@@ -163,40 +172,40 @@ public class PreferenceSpiderCompiler extends AbstractProcessor {
         String defaultValue = preference.defaultValue();
         String format = preference.format();
 
-        Constants.Type type = getOurTypeByTypeMirror(element.asType());
+        Constants.DataType dataType = getDataTypeByTypeMirror(element.asType());
 
         boolean isFormatApplicable = isFormatApplicable(format);
-        if (isFormatApplicable && type != Constants.Type.STRING) {
+        if (isFormatApplicable && dataType != Constants.DataType.STRING) {
             error(enclosingElement, "Format is only applicable in string preference. (%s.%s)", enclosingElement.getQualifiedName(), element.getSimpleName());
             hasError = true;
         }
 
         if (defaultValue.length() > 0) {
-            if (type == Constants.Type.BOOLEAN) {
+            if (dataType == Constants.DataType.BOOLEAN) {
                 boolean isValid = isValidBoolean(defaultValue);
                 if (!isValid) {
                     error(enclosingElement, "Default value of %s %s is not valid boolean. (%s.%s)", annotationClass.getSimpleName(), targetThing, enclosingElement.getQualifiedName(), element.getSimpleName());
                     hasError = true;
                 }
-            } else if (type == Constants.Type.INT) {
+            } else if (dataType == Constants.DataType.INT) {
                 boolean isValid = isValidInt(defaultValue);
                 if (!isValid) {
                     error(enclosingElement, "Default value of %s %s is not valid integer. (%s.%s)", annotationClass.getSimpleName(), targetThing, enclosingElement.getQualifiedName(), element.getSimpleName());
                     hasError = true;
                 }
-            } else if (type == Constants.Type.LONG) {
+            } else if (dataType == Constants.DataType.LONG) {
                 boolean isValid = isValidLong(defaultValue);
                 if (!isValid) {
                     error(enclosingElement, "Default value of %s %s is not valid long. (%s.%s)", annotationClass.getSimpleName(), targetThing, enclosingElement.getQualifiedName(), element.getSimpleName());
                     hasError = true;
                 }
-            } else if (type == Constants.Type.FLOAT) {
+            } else if (dataType == Constants.DataType.FLOAT) {
                 boolean isValid = isValidFloat(defaultValue);
                 if (!isValid) {
                     error(enclosingElement, "Default value of %s %s is not valid float. (%s.%s)", annotationClass.getSimpleName(), targetThing, enclosingElement.getQualifiedName(), element.getSimpleName());
                     hasError = true;
                 }
-            } else if (type == Constants.Type.DOUBLE) {
+            } else if (dataType == Constants.DataType.DOUBLE) {
                 boolean isValid = isValidFloat(defaultValue);
                 if (!isValid) {
                     error(enclosingElement, "Default value of %s %s is not valid double. (%s.%s)", annotationClass.getSimpleName(), targetThing, enclosingElement.getQualifiedName(), element.getSimpleName());
@@ -208,13 +217,33 @@ public class PreferenceSpiderCompiler extends AbstractProcessor {
         return hasError;
     }
 
-    private Constants.Type getOurTypeByTypeMirror(TypeMirror dataType) {
-        String strType = dataType.getKind().isPrimitive() ? dataType.getKind().toString() : dataType.toString();
-        if (Constants.SUPPORTED_TYPES.containsKey(strType)) {
-            return Constants.SUPPORTED_TYPES.get(strType);
+    private Constants.FieldType getFieldTypeByTypeMirror(TypeMirror typeMirror) {
+        if (Constants.SUPPORTED_FIELD_TYPES.containsKey(typeMirror.toString())) {
+            return Constants.SUPPORTED_FIELD_TYPES.get(typeMirror.toString());
         }
 
-        return Constants.Type.OTHER;
+        List<? extends TypeMirror> allSuperClass = typeUtils.directSupertypes(typeMirror);
+        for (TypeMirror type : allSuperClass) {
+            if (Constants.SUPPORTED_FIELD_TYPES.containsKey(type.toString())) {
+                return Constants.SUPPORTED_FIELD_TYPES.get(type.toString());
+            }
+        }
+
+        return Constants.FieldType.NONE;
+    }
+
+    private Constants.DataType getDataTypeByTypeMirror(TypeMirror dataType) {
+        String strType = dataType.getKind().isPrimitive() ? dataType.getKind().toString() : dataType.toString();
+        if (Constants.SUPPORTED_DATA_TYPES.containsKey(strType)) {
+            return Constants.SUPPORTED_DATA_TYPES.get(strType);
+        }
+
+        Constants.FieldType fieldType = getFieldTypeByTypeMirror(dataType);
+        if (fieldType != Constants.FieldType.NONE) {
+            return Constants.FILED_TYPE_TO_DATA_TYPE.get(fieldType);
+        }
+
+        return Constants.DataType.OTHER;
     }
 
     private boolean isFormatApplicable(String format) {

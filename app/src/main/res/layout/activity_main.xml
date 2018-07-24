@@ -7,6 +7,7 @@
     tools:context="in.moinkhan.preferencespidersample.MainActivity">
 
     <TextView
+        android:id="@+id/tv_my"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Hello World!"
@@ -19,6 +20,7 @@
         android:id="@+id/frag"
         class="in.moinkhan.preferencespidersample.SampleFragment"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_my" />
 
 </RelativeLayout>

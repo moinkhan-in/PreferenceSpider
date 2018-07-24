@@ -14,11 +14,11 @@ public class TypeStrategy {
     private final String fullyName;
     private final String prefKey;
     private final String format;
-    private final Constants.Type elementKind;
+    private final Constants.DataType elementKind;
     private final String defaultVal;
     private final String prefName;
 
-    public TypeStrategy(String fullyName, String prefKey, String format, Constants.Type elementKind, String defaultVal, String prefName) {
+    public TypeStrategy(String fullyName, String prefKey, String format, Constants.DataType elementKind, String defaultVal, String prefName) {
         this.fullyName = fullyName;
         this.prefKey = prefKey;
         this.format = format;
@@ -71,7 +71,11 @@ public class TypeStrategy {
 
     private String getDefaultValue() {
         if (defaultVal.trim().length() > 0) {
-            return defaultVal;
+            if (elementKind == Constants.DataType.STRING) {
+                return String.format("\"%s\"", defaultVal);
+            } else {
+                return defaultVal;
+            }
         }
 
         switch (elementKind) {
@@ -90,7 +94,7 @@ public class TypeStrategy {
     }
 
     public CodeBlock readStatement() {
-        if (elementKind == Constants.Type.OTHER) {
+        if (elementKind == Constants.DataType.OTHER) {
             return CodeBlock.of(
                     "prefUtils.$L($S, $S, $L.class)",
                     readMethodName(), prefName, prefKey, fullyName
