@@ -7,7 +7,9 @@ import android.widget.TextView;
 import in.moinkhan.preferencespider.PreferenceSpider;
 import in.moinkhan.preferencespider.PreferenceUtils;
 import in.moinkhan.preferencespider_annotations.Preference;
+import in.moinkhan.preferencespider_annotations.PreferenceName;
 
+@PreferenceName
 public class MainActivity extends AppCompatActivity {
 
     @Preference

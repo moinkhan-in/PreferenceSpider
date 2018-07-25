@@ -223,6 +223,14 @@ public final class PreferenceUtils {
         return new Gson().fromJson(readString(prefName, prefsKey, null), type);
     }
 
+    public <T> T read(String prefsKey, Class<T> type) {
+        return read(null, prefsKey, type);
+    }
+
+    public <T> T read(String prefName, String prefsKey, Class<T> type) {
+        return new Gson().fromJson(readString(prefName, prefsKey, null), type);
+    }
+
     public void write(String prefsKey, Object prefVal) {
         write(null, prefsKey, prefVal);
     }

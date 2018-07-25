@@ -32,6 +32,10 @@ public class Constants {
         put("android.widget.RatingBar", FieldType.RATING_BAR);
         put("android.widget.SeekBar", FieldType.SEEK_BAR);
         put("android.widget.AdapterView", FieldType.ADAPTER_VIEW);
+        put("android.widget.Spinner", FieldType.SPINNER);
+        put("android.widget.NumberPicker", FieldType.NUMBER_PICKER);
+        put("android.widget.Toolbar", FieldType.TOOL_BAR);
+        put("android.support.v7.widget.Toolbar", FieldType.TOOL_BAR);
     }};
 
     public static final HashMap<FieldType, DataType> FILED_TYPE_TO_DATA_TYPE = new HashMap<FieldType, DataType>() {{
@@ -41,6 +45,9 @@ public class Constants {
         put(FieldType.SEEK_BAR, DataType.INT);
         put(FieldType.RATING_BAR, DataType.FLOAT);
         put(FieldType.ADAPTER_VIEW, DataType.INT);
+        put(FieldType.SPINNER, DataType.INT);
+        put(FieldType.NUMBER_PICKER, DataType.INT);
+        put(FieldType.TOOL_BAR, DataType.STRING);
         put(FieldType.NONE, DataType.OTHER);
     }};
 
@@ -63,6 +70,9 @@ public class Constants {
         RATING_BAR,
         SEEK_BAR,
         ADAPTER_VIEW,
+        SPINNER,
+        NUMBER_PICKER,
+        TOOL_BAR,
 
         NONE
     }

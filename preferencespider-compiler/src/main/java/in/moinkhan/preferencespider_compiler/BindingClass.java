@@ -61,6 +61,7 @@ public class BindingClass {
                 .addCode(CodeBlock.of("this.$L = $L;\n", targetName.toLowerCase(), targetName.toLowerCase()));
 
         return TypeSpec.classBuilder(targetName + "_PreferenceSpider")
+                .addModifiers(Modifier.FINAL)
                 .addSuperinterface(Imports.PREFERENCE_BINDER)
                 .addField(FieldSpec.builder(ClassName.get(typeElement), targetName.toLowerCase(), Modifier.PRIVATE).build())
                 .addMethod(constructor.build())

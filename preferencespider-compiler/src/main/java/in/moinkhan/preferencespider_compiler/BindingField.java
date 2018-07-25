@@ -34,7 +34,12 @@ public class BindingField {
             case RATING_BAR:
                 return CodeBlock.of("$L.setRating($L);\n", targetVar, typeStrategy.readStatement());
             case ADAPTER_VIEW:
+            case SPINNER:
                 return CodeBlock.of("$L.setSelection($L);\n", targetVar, typeStrategy.readStatement());
+            case NUMBER_PICKER:
+                return CodeBlock.of("$L.setValue($L);\n", targetVar, typeStrategy.readStatement());
+            case TOOL_BAR:
+                return CodeBlock.of("$L.setTitle($L);\n", targetVar, typeStrategy.readStatement());
             default:
                 return CodeBlock.of("$L = $L;\n", targetVar, typeStrategy.readStatement());
         }
@@ -56,7 +61,12 @@ public class BindingField {
             case RATING_BAR:
                 return typeStrategy.writeStatement(String.format("%s.%s", targetVar, "getRating()"));
             case ADAPTER_VIEW:
-                return typeStrategy.writeStatement(String.format("%s.%s", targetVar, "getSelection()"));
+            case SPINNER:
+                return typeStrategy.writeStatement(String.format("%s.%s", targetVar, "getSelectedItemPosition()"));
+            case NUMBER_PICKER:
+                return typeStrategy.writeStatement(String.format("%s.%s", targetVar, "getValue()"));
+            case TOOL_BAR:
+                return typeStrategy.writeStatement(String.format("%s.%s", targetVar, "getTitle().toString()"));
             default:
                 return typeStrategy.writeStatement(targetVar);
         }
