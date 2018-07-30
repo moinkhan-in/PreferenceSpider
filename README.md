@@ -20,7 +20,7 @@ dependencies {
 ```
 
 Field binding with shared preferences of Android which uses annotation processing to generate boilerplate
-code for you.
+code for you. for detail technical tutorial visit https://medium.com/@moinkhan_in/oh-no-again-sharedpreferences-942bf00cd097
 
  * Eliminate creating of preference class by using `@Preference` on fields.
  * It use code generation instead of reflection to make it faster.
