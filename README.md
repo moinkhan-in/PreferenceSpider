@@ -133,14 +133,6 @@ You can also use the `format` attribute to make formatted string. e.g Welcome: [
   - You can give only 1 format specifier, otherwise it throws `MissingArgumentException` as preference contain single value.
   - Once you apply the format that field will become default readOnly. Because your preferece should not be overwrite with formatted string.
 
-#### Don't want to use annotations, I created a singleton preference helper class for you.
-
-```java
-  int spInt = PreferenceUtils.getInstance(context).readInt("sp_int");
-
-  User user = PreferenceUtils.getInstance(context).read("spUser", User.class);
-```
-
 ##### View and Preference Mapping table
 
 
@@ -153,6 +145,15 @@ You can also use the `format` attribute to make formatted string. e.g Welcome: [
 |Integer     | getSelectedItem()|setSelection() | Spinner, <br> <? extends Spinner>
 |Boolean     | getChecked()    | setChecked()   | CheckBox, RadioButton, ToggleButton, Switch, <br> <? extends CompoundButton>
 |Float       | getRating()     | setRating()    | RatingBar, <br> <? extends RatingBar>
+
+
+#### Don't want to use annotations, I created a singleton preference helper class for you.
+
+```java
+  int spInt = PreferenceUtils.getInstance(context).readInt("sp_int");
+
+  User user = PreferenceUtils.getInstance(context).read("spUser", User.class);
+```
 
 ###### You can use following methods.
 ```java
