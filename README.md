@@ -1,5 +1,5 @@
 # PreferenceSpider
-Bind android shared preference values to field.
+Bind android shared preference values to field/Views.
 Read/Write operations of shared preferences are done using the only annotation.
 
 __Remember: The PreferenceSpider is like ButterKnife, But this library bind sharedpreferences.__
@@ -9,8 +9,13 @@ Download
 
 ```groovy
 dependencies {
-  implementation 'in.moinkhan:preferencespider:alpha-2.5'
-  annotationProcessor 'in.moinkhan:preferencespider-compiler:alpha-2.5'
+  implementation 'in.moinkhan:preferencespider:alpha-3.0'
+
+  // for java
+  annotationProcessor 'in.moinkhan:preferencespider-compiler:alpha-3.0'
+
+  // for kotlin
+  kapt 'in.moinkhan:preferencespider-compiler:alpha-3.0'
 }
 ```
 
@@ -21,30 +26,35 @@ code for you.
  * It use code generation instead of reflection to make it faster.
  * Use the preference singleton class for memory efficiency.
  * Eliminate boilerplate code to read/write the preference code.
- * Apply string formatting on preference.
+ * Bind the preference values with views.
+ * Apply string formatting on preferences.
  * Can use with your existing preferences.
  * Use native shared preference.
- * Can store object also.
+ * Support custom object.
 
 ```java
+// It will store all perefrences of this class into 'exmamle_preferences' file.
+// It is optional.
+@PreferenceName("example_preferences")
 class ExampleActivity extends Activity {
 
-  // Use field name as preference key ie. 'spInt', and default shared preference file.
+  // Will use field name as preference key ie. 'spInt', and default shared preference file.
   @Preference
   Integer spInt;
 
-  // Use given key as preference key, and default shared preference file.
+  // Will use given key as preference key, and default shared preference file.
   @Preference(key = "sp_user")
   User spUser;
 
-  // Use given key as preference key, and return given default value if not found.
-  @Preference(key = "sp_boolean", defaultValue = "true")
-  boolean spBoolean;
+  // Will use given key as preference key, and return given default value if not found.
+  @Preference(key = "sp_remember", defaultValue = "true")
+  CheckBox spRememberMe;
 
   @Override public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.simple_activity);
-    
+
+    // If your target contains the View, make sure it is binded and not null.
     PreferenceSpider.read(this);
     // TODO Use fields...
   }
@@ -55,9 +65,9 @@ class ExampleActivity extends Activity {
   
     // somehow you update the value.
     spUser = new User(1, "TestUSer");
-    spBoolean = false;
     spInt = 50;
-    
+    spRememberMe.setChecked(false);
+
     // save this to shared preference.
     PreferenceSpider.write(this);
   }
@@ -72,12 +82,10 @@ class ExampleActivity extends Activity {
     String userName;
 
     ExampleAdapter(Context context) {
-      // ...
       PreferenceSpider.read(this, context);
       // ...
     }
 
-    // .....
   }
 
 ```
@@ -133,6 +141,19 @@ You can also use the `format` attribute to make formatted string. e.g Welcome: [
   User user = PreferenceUtils.getInstance(context).read("spUser", User.class);
 ```
 
+##### View and Preference Mapping table
+
+
+|Data Type     | Write Method    | Read Method    | Supported Views     |
+|--------------|-----------------|----------------|---------------------|
+|String      | getText()       | setText()      | EditText, TextView, CheckedTextView, Button, Chronometer,  <br> <? extends TextView>
+|String      | getTitle()      | setTitle()     | ToolBar, <br> <? extends ToolBar>
+|Integer     | getProgress()   | setProgress()  | ProgressBar, SeekBar,<br> <? extends ProgressBar>
+|Integer     | getValue()      | setValue()     | NumberPicker,<br> <? extends NumberPicker>
+|Integer     | getSelectedItem()|setSelection() | Spinner, <br> <? extends Spinner>
+|Boolean     | getChecked()    | setChecked()   | CheckBox, RadioButton, ToggleButton, Switch, <br> <? extends CompoundButton>
+|Float       | getRating()     | setRating()    | RatingBar, <br> <? extends RatingBar>
+
 ###### You can use following methods.
 ```java
   // custom object
@@ -140,6 +161,10 @@ You can also use the `format` attribute to make formatted string. e.g Welcome: [
   <T> T read(String prefsKey, Type type)
 
   <T> T read(String prefName, String prefsKey, Type type)
+
+  <T> T read(String prefsKey, Class<T> type)
+
+  <T> T read(String prefName, String prefsKey, Class<T> type)
 
   void write(String prefsKey, Object prefVal)
 

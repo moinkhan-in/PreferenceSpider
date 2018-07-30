@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.SwitchCompat;
 import android.widget.CheckBox;
+import android.widget.CheckedTextView;
 import android.widget.EditText;
 import android.widget.NumberPicker;
 import android.widget.ProgressBar;
@@ -14,6 +15,7 @@ import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 import android.widget.Toolbar;
 
 import in.moinkhan.preferencespider_annotations.Preference;
@@ -33,6 +35,12 @@ public class WidgetActivity extends AppCompatActivity {
 
     @Preference(defaultValue = "true")
     CheckBox checkBox;
+
+    @Preference
+    CheckedTextView checkedTextView;
+
+    @Preference
+    ToggleButton toggleButton;
 
     @Preference
     RadioButton radioButton;

@@ -31,6 +31,8 @@ import static javax.lang.model.element.ElementKind.CLASS;
 import static javax.lang.model.element.Modifier.PRIVATE;
 import static javax.lang.model.element.Modifier.STATIC;
 
+//import in.moinkhan.preferencespider_annotations.OnPreferenceChanged;
+
 public class PreferenceSpiderCompiler extends AbstractProcessor {
 
     private Filer filer;
@@ -59,6 +61,7 @@ public class PreferenceSpiderCompiler extends AbstractProcessor {
         Set<Class<? extends Annotation>> annotations = new HashSet<>();
         annotations.add(Preference.class);
         annotations.add(PreferenceName.class);
+//        annotations.add(OnPreferenceChanged.class);
         return annotations;
     }
 
