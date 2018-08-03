@@ -19,28 +19,33 @@ public class BindingClass {
 
     private String targetName;
     private Set<BindingField> varList;
+    private Set<BindingMethod> methodsList;
 
-    public void setTargetName(String targetName) {
+    public BindingClass(String targetName, Set<BindingField> varList, Set<BindingMethod> methodsList) {
         this.targetName = targetName;
-    }
-
-    public void setVarList(Set<BindingField> varList) {
         this.varList = varList;
+        this.methodsList = methodsList;
     }
 
     public TypeSpec getClassCode(TypeElement typeElement) {
 
         MethodSpec.Builder readPreferenceValues = MethodSpec.methodBuilder("bindPreferenceValue");
         MethodSpec.Builder commitPreferenceValues = MethodSpec.methodBuilder("commitPreferenceValues");
+        MethodSpec.Builder registerCallBacks = MethodSpec.methodBuilder("registerCallBacks");
 
         if (varList != null && varList.size() > 0) {
             readPreferenceValues.addCode(CodeBlock.of("$T prefUtils = $T.getInstance(context);\n", Imports.PREFERENCE_UTILS, Imports.PREFERENCE_UTILS));
             commitPreferenceValues.addCode(CodeBlock.of("$T prefUtils = $T.getInstance(context);\n", Imports.PREFERENCE_UTILS, Imports.PREFERENCE_UTILS));
+            registerCallBacks.addCode(CodeBlock.of("$T prefUtils = $T.getInstance(context);\n", Imports.PREFERENCE_UTILS, Imports.PREFERENCE_UTILS));
         }
 
         for (BindingField bindingField : varList) {
             readPreferenceValues.addCode(bindingField.readBlock());
             commitPreferenceValues.addCode(bindingField.writeBlock());
+        }
+
+        for (BindingMethod bindingMethod : methodsList) {
+            registerCallBacks.addCode(bindingMethod.onChangedBlock());
         }
 
         readPreferenceValues
@@ -50,6 +55,12 @@ public class BindingClass {
                 .build();
 
         commitPreferenceValues
+                .addAnnotation(Override.class)
+                .addModifiers(Modifier.PUBLIC)
+                .addParameter(Imports.CONTEXT, "context")
+                .build();
+
+        registerCallBacks
                 .addAnnotation(Override.class)
                 .addModifiers(Modifier.PUBLIC)
                 .addParameter(Imports.CONTEXT, "context")
@@ -67,6 +78,7 @@ public class BindingClass {
                 .addMethod(constructor.build())
                 .addMethod(readPreferenceValues.build())
                 .addMethod(commitPreferenceValues.build())
+                .addMethod(registerCallBacks.build())
                 .build();
     }
 }

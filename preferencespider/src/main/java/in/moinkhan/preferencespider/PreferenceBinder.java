@@ -10,4 +10,6 @@ public interface PreferenceBinder {
     void bindPreferenceValue(Context context);
 
     void commitPreferenceValues(Context context);
+
+    void registerCallBacks(Context context);
 }

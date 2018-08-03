@@ -6,6 +6,7 @@ import android.widget.TextView;
 
 import in.moinkhan.preferencespider.PreferenceSpider;
 import in.moinkhan.preferencespider.PreferenceUtils;
+import in.moinkhan.preferencespider_annotations.OnPreferenceChanged;
 import in.moinkhan.preferencespider_annotations.Preference;
 import in.moinkhan.preferencespider_annotations.PreferenceName;
 
@@ -83,5 +84,11 @@ public class MainActivity extends AppCompatActivity {
         User user5 = PreferenceUtils.getInstance(this).read("spUser", User.class);
 
         PreferenceSpider.write(this);
+    }
+
+
+    @OnPreferenceChanged(keys = {"asd", "asd"})
+    void onChange(String key) {
+
     }
 }

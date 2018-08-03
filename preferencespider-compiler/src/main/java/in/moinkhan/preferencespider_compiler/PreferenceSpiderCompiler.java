@@ -24,14 +24,13 @@ import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 
+import in.moinkhan.preferencespider_annotations.OnPreferenceChanged;
 import in.moinkhan.preferencespider_annotations.Preference;
 import in.moinkhan.preferencespider_annotations.PreferenceName;
 
 import static javax.lang.model.element.ElementKind.CLASS;
 import static javax.lang.model.element.Modifier.PRIVATE;
 import static javax.lang.model.element.Modifier.STATIC;
-
-//import in.moinkhan.preferencespider_annotations.OnPreferenceChanged;
 
 public class PreferenceSpiderCompiler extends AbstractProcessor {
 
@@ -78,6 +77,15 @@ public class PreferenceSpiderCompiler extends AbstractProcessor {
             }
         }
 
+        // OnPreferenceChanged validations
+        Set<? extends Element> onPreferenceElements = roundEnvironment.getElementsAnnotatedWith(OnPreferenceChanged.class);
+        for (Element element : onPreferenceElements) {
+            if (isInaccessibleViaGeneratedCode(OnPreferenceChanged.class, "method", element)) {
+                hasError = true;
+            }
+
+        }
+
         // collecting all @Preference annotations.
         Map<TypeElement, Set<Element>> mapElements = new LinkedHashMap<>();
         for (Element element : preferenceElement) {
@@ -86,57 +94,40 @@ public class PreferenceSpiderCompiler extends AbstractProcessor {
                 mapElements.put(classType, new LinkedHashSet<Element>());
             }
             mapElements.get(classType).add(element);
+
+        }
+
+        // collecting all @OnPreferenceChanged annotations.
+        Map<TypeElement, Set<Element>> mapPreferenceChangedElements = new LinkedHashMap<>();
+        for (Element element : onPreferenceElements) {
+            TypeElement classType = (TypeElement) element.getEnclosingElement();
+            if (!mapPreferenceChangedElements.containsKey(classType)) {
+                mapPreferenceChangedElements.put(classType, new LinkedHashSet<Element>());
+            }
+            mapPreferenceChangedElements.get(classType).add(element);
         }
 
         if (hasError) {
             return false;
         }
 
-        processElement(mapElements);
+        processElement(mapElements, mapPreferenceChangedElements);
         return true;
     }
 
-    private void processElement(Map<TypeElement, Set<Element>> mapElements) {
+    private void processElement(Map<TypeElement, Set<Element>> mapElements, Map<TypeElement, Set<Element>> mapPreferenceChangedElements) {
         for (Map.Entry<TypeElement, Set<Element>> entry : mapElements.entrySet()) {
 
             TypeElement classElement = entry.getKey();
             final String className = classElement.getSimpleName().toString();
 
-            BindingClass bindingClass = new BindingClass();
-            bindingClass.setTargetName(className);
-
-            Set<BindingField> models = new HashSet<>();
-            bindingClass.setVarList(models);
-
-            for (Element prefElement : entry.getValue()) {
-
-                Preference prefAnnotation = prefElement.getAnnotation(Preference.class);
-
-                String varName = prefElement.getSimpleName().toString();
-                String key = prefAnnotation.key().length() > 0 ? prefAnnotation.key() : varName;
-
-                String preferenceName = prefAnnotation.name();
-                if (preferenceName.trim().length() <= 0) {
-                    preferenceName = getPreferenceNameFromClass(prefElement);
-                }
-
-                Constants.DataType dataType = getDataTypeByTypeMirror(prefElement.asType());
-                Constants.FieldType fieldType = getFieldTypeByTypeMirror(prefElement.asType());
-
-                showMessage(dataType.name() + " -> " + fieldType.name());
-                models.add(new BindingField(
-                        prefElement.asType().toString(),
-                        String.format("%s.%s", className.toLowerCase(), varName),
-                        key,
-                        prefAnnotation.format(),
-                        fieldType,
-                        dataType,
-                        prefAnnotation.defaultValue(),
-                        preferenceName,
-                        prefAnnotation.readOnly()
-                ));
+            Set<BindingField> allBindingFields = getAllBindingFields(className, entry.getValue());
+            Set<BindingMethod> allBindingMethods = new LinkedHashSet<>();
+            if (mapPreferenceChangedElements.containsKey(classElement)) {
+                allBindingMethods = getAllBindingMethods(className, mapPreferenceChangedElements.get(classElement));
             }
 
+            BindingClass bindingClass = new BindingClass(className, allBindingFields, allBindingMethods);
             TypeSpec typeSpec = bindingClass.getClassCode(classElement);
             JavaFile file = JavaFile.builder(elementUtils.getPackageOf(classElement).toString(), typeSpec)
                     .build();
@@ -148,6 +139,55 @@ public class PreferenceSpiderCompiler extends AbstractProcessor {
                 error(classElement, "%s cannot write", classElement.getSimpleName());
             }
         }
+    }
+
+    private Set<BindingMethod> getAllBindingMethods(String className, Set<Element> elements) {
+        Set<BindingMethod> allMethods = new LinkedHashSet<>();
+        for (Element element : elements) {
+            OnPreferenceChanged onPreferenceChanged = element.getAnnotation(OnPreferenceChanged.class);
+            if (onPreferenceChanged != null) {
+                String preferenceName = onPreferenceChanged.name();
+                if (preferenceName.trim().length() <= 0) {
+                    preferenceName = getPreferenceNameFromClass(element);
+                }
+                allMethods.add(new BindingMethod(preferenceName, onPreferenceChanged.keys()));
+            }
+        }
+        return allMethods;
+    }
+
+    private Set<BindingField> getAllBindingFields(String className, Set<Element> value) {
+        Set<BindingField> allFields = new LinkedHashSet<>();
+        for (Element prefElement : value) {
+
+            Preference prefAnnotation = prefElement.getAnnotation(Preference.class);
+
+            String varName = prefElement.getSimpleName().toString();
+            String key = prefAnnotation.key().length() > 0 ? prefAnnotation.key() : varName;
+
+            String preferenceName = prefAnnotation.name();
+            if (preferenceName.trim().length() <= 0) {
+                preferenceName = getPreferenceNameFromClass(prefElement);
+            }
+
+            Constants.DataType dataType = getDataTypeByTypeMirror(prefElement.asType());
+            Constants.FieldType fieldType = getFieldTypeByTypeMirror(prefElement.asType());
+
+            showMessage(dataType.name() + " -> " + fieldType.name());
+            allFields.add(new BindingField(
+                    prefElement.asType().toString(),
+                    String.format("%s.%s", className.toLowerCase(), varName),
+                    key,
+                    prefAnnotation.format(),
+                    fieldType,
+                    dataType,
+                    prefAnnotation.defaultValue(),
+                    preferenceName,
+                    prefAnnotation.readOnly()
+            ));
+        }
+
+        return allFields;
     }
 
     private String getPreferenceNameFromClass(Element prefElement) {
@@ -193,50 +233,51 @@ public class PreferenceSpiderCompiler extends AbstractProcessor {
         }
 
         // verify is it from supported type.
-
         // verify default value
-        Preference preference = (Preference) element.getAnnotation(annotationClass);
-        String defaultValue = preference.defaultValue();
-        String format = preference.format();
+        Preference preference = element.getAnnotation(Preference.class);
+        if (preference != null) {
+            String defaultValue = preference.defaultValue();
+            String format = preference.format();
 
-        Constants.DataType dataType = getDataTypeByTypeMirror(element.asType());
+            Constants.DataType dataType = getDataTypeByTypeMirror(element.asType());
 
-        boolean isFormatApplicable = isFormatApplicable(format);
-        if (isFormatApplicable && dataType != Constants.DataType.STRING) {
-            error(enclosingElement, "Format is only applicable in string preference. (%s.%s)", enclosingElement.getQualifiedName(), element.getSimpleName());
-            hasError = true;
-        }
+            boolean isFormatApplicable = isFormatApplicable(format);
+            if (isFormatApplicable && dataType != Constants.DataType.STRING) {
+                error(enclosingElement, "Format is only applicable in string preference. (%s.%s)", enclosingElement.getQualifiedName(), element.getSimpleName());
+                hasError = true;
+            }
 
-        if (defaultValue.length() > 0) {
-            if (dataType == Constants.DataType.BOOLEAN) {
-                boolean isValid = isValidBoolean(defaultValue);
-                if (!isValid) {
-                    error(enclosingElement, "Default value of %s %s is not valid boolean. (%s.%s)", annotationClass.getSimpleName(), targetThing, enclosingElement.getQualifiedName(), element.getSimpleName());
-                    hasError = true;
-                }
-            } else if (dataType == Constants.DataType.INT) {
-                boolean isValid = isValidInt(defaultValue);
-                if (!isValid) {
-                    error(enclosingElement, "Default value of %s %s is not valid integer. (%s.%s)", annotationClass.getSimpleName(), targetThing, enclosingElement.getQualifiedName(), element.getSimpleName());
-                    hasError = true;
-                }
-            } else if (dataType == Constants.DataType.LONG) {
-                boolean isValid = isValidLong(defaultValue);
-                if (!isValid) {
-                    error(enclosingElement, "Default value of %s %s is not valid long. (%s.%s)", annotationClass.getSimpleName(), targetThing, enclosingElement.getQualifiedName(), element.getSimpleName());
-                    hasError = true;
-                }
-            } else if (dataType == Constants.DataType.FLOAT) {
-                boolean isValid = isValidFloat(defaultValue);
-                if (!isValid) {
-                    error(enclosingElement, "Default value of %s %s is not valid float. (%s.%s)", annotationClass.getSimpleName(), targetThing, enclosingElement.getQualifiedName(), element.getSimpleName());
-                    hasError = true;
-                }
-            } else if (dataType == Constants.DataType.DOUBLE) {
-                boolean isValid = isValidFloat(defaultValue);
-                if (!isValid) {
-                    error(enclosingElement, "Default value of %s %s is not valid double. (%s.%s)", annotationClass.getSimpleName(), targetThing, enclosingElement.getQualifiedName(), element.getSimpleName());
-                    hasError = true;
+            if (defaultValue.length() > 0) {
+                if (dataType == Constants.DataType.BOOLEAN) {
+                    boolean isValid = isValidBoolean(defaultValue);
+                    if (!isValid) {
+                        error(enclosingElement, "Default value of %s %s is not valid boolean. (%s.%s)", annotationClass.getSimpleName(), targetThing, enclosingElement.getQualifiedName(), element.getSimpleName());
+                        hasError = true;
+                    }
+                } else if (dataType == Constants.DataType.INT) {
+                    boolean isValid = isValidInt(defaultValue);
+                    if (!isValid) {
+                        error(enclosingElement, "Default value of %s %s is not valid integer. (%s.%s)", annotationClass.getSimpleName(), targetThing, enclosingElement.getQualifiedName(), element.getSimpleName());
+                        hasError = true;
+                    }
+                } else if (dataType == Constants.DataType.LONG) {
+                    boolean isValid = isValidLong(defaultValue);
+                    if (!isValid) {
+                        error(enclosingElement, "Default value of %s %s is not valid long. (%s.%s)", annotationClass.getSimpleName(), targetThing, enclosingElement.getQualifiedName(), element.getSimpleName());
+                        hasError = true;
+                    }
+                } else if (dataType == Constants.DataType.FLOAT) {
+                    boolean isValid = isValidFloat(defaultValue);
+                    if (!isValid) {
+                        error(enclosingElement, "Default value of %s %s is not valid float. (%s.%s)", annotationClass.getSimpleName(), targetThing, enclosingElement.getQualifiedName(), element.getSimpleName());
+                        hasError = true;
+                    }
+                } else if (dataType == Constants.DataType.DOUBLE) {
+                    boolean isValid = isValidFloat(defaultValue);
+                    if (!isValid) {
+                        error(enclosingElement, "Default value of %s %s is not valid double. (%s.%s)", annotationClass.getSimpleName(), targetThing, enclosingElement.getQualifiedName(), element.getSimpleName());
+                        hasError = true;
+                    }
                 }
             }
         }

@@ -239,7 +239,7 @@ public final class PreferenceUtils {
         writeString(prefName, prefsKey, new Gson().toJson(prefVal));
     }
 
-    private SharedPreferences getPrefs(String prefName) {
+    public SharedPreferences getPrefs(String prefName) {
         prefName = prefName == null || prefName.trim().length() == 0 ? PreferenceSpider.getInstance().getPreferenceName() : prefName;
         if (prefName == null) {
             return PreferenceManager.getDefaultSharedPreferences(mContext);
@@ -251,5 +251,6 @@ public final class PreferenceUtils {
     private SharedPreferences.Editor getPrefsEditor(String prefName) {
         return getPrefs(prefName).edit();
     }
+
 
 }
